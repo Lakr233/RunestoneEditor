@@ -2,4 +2,4 @@
 @_exported import RunestoneLanguageSupport
 @_exported import RunestoneThemeSupport
 
-typealias RunestoneEditorView = TextView
+public typealias RunestoneEditorView = TextView

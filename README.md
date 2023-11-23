@@ -4,6 +4,34 @@ Simple package to load [Runstone](https://github.com/simonbs/Runestone) with use
 
 **You need to download this repo and drag it into your project.** Swift Package Manager doesn't support nested packages, yet.
 
+To create a new Runestone editor, you can use the following code. `smartDashesType` `smartQuotesType` `smartInsertDeleteType` shall be disabled manually.
+
+```
+let textView = RunestoneEditorView()
+
+textView.contentInsetAdjustmentBehavior = .always
+textView.autocorrectionType = .no
+textView.autocapitalizationType = .none
+textView.smartDashesType = .no
+textView.smartQuotesType = .no
+textView.smartInsertDeleteType = .no
+
+textView.backgroundColor = .clear
+textView.textContainerInset = UIEdgeInsets(top: 8, left: 4, bottom: 8, right: 4)
+textView.showLineNumbers = true
+textView.lineHeightMultiplier = 1.2
+textView.kern = 0.3
+textView.showSpaces = true
+textView.showNonBreakingSpaces = true
+textView.showTabs = true
+textView.showLineBreaks = true
+textView.showSoftLineBreaks = true
+textView.isLineWrappingEnabled = true
+
+let state = TextViewState(text: initialSnippet, theme: TomorrowNightTheme(), language: .bash)
+textView.setState(state)
+```
+
 ## RunestoneEditor
 
 When loading `RunestoneEditor` package you get the following components with all possible support options.
