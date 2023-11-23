@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "TreeSitter",
     platforms: [
-        .iOS(.v14), .macCatalyst(.v14)
+        .iOS(.v14), .macCatalyst(.v14),
     ],
     products: [
         .library(name: "TreeSitter", targets: ["TreeSitter"]),

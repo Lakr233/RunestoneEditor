@@ -1,39 +1,39 @@
-import TreeSitterAstroRunestone
-import TreeSitterBashRunestone
-import TreeSitterCommentRunestone
-import TreeSitterCPPRunestone
-import TreeSitterCRunestone
-import TreeSitterCSharpRunestone
-import TreeSitterCSSRunestone
-import TreeSitterElixirRunestone
-import TreeSitterElmRunestone
-import TreeSitterGoRunestone
-import TreeSitterHaskellRunestone
-import TreeSitterHTMLRunestone
-import TreeSitterJavaRunestone
-import TreeSitterJavaScriptRunestone
-import TreeSitterJSDocRunestone
-import TreeSitterJSON5Runestone
-import TreeSitterJSONRunestone
-import TreeSitterJuliaRunestone
-import TreeSitterLaTeXRunestone
-import TreeSitterLuaRunestone
-import TreeSitterMarkdownInlineRunestone
-import TreeSitterMarkdownRunestone
-import TreeSitterOCamlRunestone
-import TreeSitterPerlRunestone
-import TreeSitterPHPRunestone
-import TreeSitterPythonRunestone
-import TreeSitterRegexQueries
-import TreeSitterRegexRunestone
-import TreeSitterRRunestone
-import TreeSitterRubyRunestone
-import TreeSitterRustRunestone
-import TreeSitterSCSSRunestone
-import TreeSitterSQLRunestone
-import TreeSitterSvelteRunestone
-import TreeSitterSwiftRunestone
-import TreeSitterTOMLRunestone
-import TreeSitterTSXRunestone
-import TreeSitterTypeScriptRunestone
-import TreeSitterYAMLRunestone
+@_exported import TreeSitterAstroRunestone
+@_exported import TreeSitterBashRunestone
+@_exported import TreeSitterCommentRunestone
+@_exported import TreeSitterCPPRunestone
+@_exported import TreeSitterCRunestone
+@_exported import TreeSitterCSharpRunestone
+@_exported import TreeSitterCSSRunestone
+@_exported import TreeSitterElixirRunestone
+@_exported import TreeSitterElmRunestone
+@_exported import TreeSitterGoRunestone
+@_exported import TreeSitterHaskellRunestone
+@_exported import TreeSitterHTMLRunestone
+@_exported import TreeSitterJavaRunestone
+@_exported import TreeSitterJavaScriptRunestone
+@_exported import TreeSitterJSDocRunestone
+@_exported import TreeSitterJSON5Runestone
+@_exported import TreeSitterJSONRunestone
+@_exported import TreeSitterJuliaRunestone
+@_exported import TreeSitterLaTeXRunestone
+@_exported import TreeSitterLuaRunestone
+@_exported import TreeSitterMarkdownInlineRunestone
+@_exported import TreeSitterMarkdownRunestone
+@_exported import TreeSitterOCamlRunestone
+@_exported import TreeSitterPerlRunestone
+@_exported import TreeSitterPHPRunestone
+@_exported import TreeSitterPythonRunestone
+@_exported import TreeSitterRegexQueries
+@_exported import TreeSitterRegexRunestone
+@_exported import TreeSitterRRunestone
+@_exported import TreeSitterRubyRunestone
+@_exported import TreeSitterRustRunestone
+@_exported import TreeSitterSCSSRunestone
+@_exported import TreeSitterSQLRunestone
+@_exported import TreeSitterSvelteRunestone
+@_exported import TreeSitterSwiftRunestone
+@_exported import TreeSitterTOMLRunestone
+@_exported import TreeSitterTSXRunestone
+@_exported import TreeSitterTypeScriptRunestone
+@_exported import TreeSitterYAMLRunestone

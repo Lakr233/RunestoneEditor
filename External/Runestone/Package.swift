@@ -7,7 +7,7 @@ let package = Package(
     name: "Runestone",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v14), .macCatalyst(.v14)
+        .iOS(.v14), .macCatalyst(.v14),
     ],
     products: [
         .library(name: "Runestone", targets: ["Runestone"]),
@@ -21,7 +21,7 @@ let package = Package(
         ], resources: [
             .process("TextView/Appearance/Theme.xcassets"),
         ]),
-        .target(name: "TestTreeSitterLanguages", cSettings: [.unsafeFlags(["-w"]),]),
-        .testTarget(name: "RunestoneTests", dependencies: ["Runestone", "TestTreeSitterLanguages",]),
+        .target(name: "TestTreeSitterLanguages", cSettings: [.unsafeFlags(["-w"])]),
+        .testTarget(name: "RunestoneTests", dependencies: ["Runestone", "TestTreeSitterLanguages"]),
     ]
 )

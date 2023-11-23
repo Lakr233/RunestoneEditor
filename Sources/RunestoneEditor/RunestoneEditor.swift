@@ -1,5 +1,5 @@
-import Runestone
-import RunestoneLanguageSupport
-import RunestoneThemeSupport
+@_exported import Runestone
+@_exported import RunestoneLanguageSupport
+@_exported import RunestoneThemeSupport
 
-typealias RunestoneEditor = TextView
+typealias RunestoneEditorView = TextView

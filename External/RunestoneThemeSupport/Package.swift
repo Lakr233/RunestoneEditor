@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "RunestoneThemeSupport",
     platforms: [
-        .iOS(.v14), .macCatalyst(.v14)
+        .iOS(.v14), .macCatalyst(.v14),
     ],
     products: [
         .library(name: "RunestoneThemeSupport", targets: ["RunestoneThemeSupport"]),
