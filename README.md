@@ -2,6 +2,8 @@
 
 Simple package to load [Runstone](https://github.com/simonbs/Runestone) with useful components.
 
+**You need to download this repo and drag it into your project.** Swift Package Manager doesn't support nested packages, yet.
+
 ## RunestoneEditor
 
 When loading `RunestoneEditor` package you get the following components with all possible support options.
