@@ -1,4 +1,3 @@
 @_exported import RunestoneOneDarkTheme
 @_exported import RunestonePlainTextTheme
-@_exported import RunestoneTomorrowNightTheme
 @_exported import RunestoneTomorrowTheme

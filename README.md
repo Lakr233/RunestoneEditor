@@ -4,7 +4,15 @@ Simple package to load [Runstone](https://github.com/simonbs/Runestone) with use
 
 **You need to download this repo and drag it into your project.** Swift Package Manager doesn't support nested packages, yet.
 
-To create a new Runestone editor, you can use the following code. `smartDashesType` `smartQuotesType` `smartInsertDeleteType` shall be disabled manually.
+To create a new text editor, you can use the suggested figure with code below.
+
+```
+let textView = RunestoneEditorView.new()        
+textView.apply(language: .bash)
+textView.apply(theme: TomorrowTheme(size: 14))
+```
+
+Or you can setup the editor manually. Note that `autocorrectionType` `autocapitalizationType` `smartDashesType` `smartQuotesType` `smartInsertDeleteType` shall be disabled manually.
 
 ```
 let textView = RunestoneEditorView()
@@ -47,8 +55,7 @@ Or you can load individual components by using its name instead.
 
 Theme support for Runestone are provided as packages. You can either load `RunestoneThemeSupport` for all themes or load individual themes. See `Package.swift` for individual packages.
 
-- Tomorrow
-- TomorrowNight
+- Tomorrow (Both Light & Dark)
 - OneDark
 - PlainText
 

@@ -12,7 +12,6 @@ let package = Package(
         .library(name: "RunestoneThemeSupport", targets: ["RunestoneThemeSupport"]),
 
         .library(name: "RunestoneTomorrowTheme", targets: ["RunestoneTomorrowTheme"]),
-        .library(name: "RunestoneTomorrowNightTheme", targets: ["RunestoneTomorrowNightTheme"]),
         .library(name: "RunestoneOneDarkTheme", targets: ["RunestoneOneDarkTheme"]),
         .library(name: "RunestonePlainTextTheme", targets: ["RunestonePlainTextTheme"]),
         .library(name: "RunestoneThemeCommon", targets: ["RunestoneThemeCommon"]),
@@ -23,7 +22,6 @@ let package = Package(
     targets: [
         .target(name: "RunestoneThemeSupport", dependencies: [
             "RunestoneTomorrowTheme",
-            "RunestoneTomorrowNightTheme",
             "RunestoneOneDarkTheme",
             "RunestonePlainTextTheme",
         ]),
@@ -31,7 +29,6 @@ let package = Package(
         .target(name: "RunestoneThemeCommon", dependencies: ["Runestone"]),
 
         .target(name: "RunestoneTomorrowTheme", dependencies: ["Runestone", "RunestoneThemeCommon"], resources: [.process("Colors.xcassets")]),
-        .target(name: "RunestoneTomorrowNightTheme", dependencies: ["Runestone", "RunestoneThemeCommon"], resources: [.process("Colors.xcassets")]),
         .target(name: "RunestoneOneDarkTheme", dependencies: ["Runestone", "RunestoneThemeCommon"], resources: [.process("Colors.xcassets")]),
         .target(name: "RunestonePlainTextTheme", dependencies: ["Runestone", "RunestoneThemeCommon"]),
     ]

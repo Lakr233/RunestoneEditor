@@ -6,20 +6,20 @@ public final class TomorrowTheme: EditorTheme {
     public let backgroundColor = UIColor(namedInModule: "TomorrowBackground")
     public let userInterfaceStyle: UIUserInterfaceStyle = .light
 
-    public let font: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
+    public let font: UIFont
     public let textColor = UIColor(namedInModule: "TomorrowForeground")
 
     public let gutterBackgroundColor = UIColor(namedInModule: "TomorrowCurrentLine")
     public let gutterHairlineColor = UIColor(namedInModule: "TomorrowComment")
 
     public let lineNumberColor = UIColor(namedInModule: "TomorrowForeground").withAlphaComponent(0.5)
-    public let lineNumberFont: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
+    public let lineNumberFont: UIFont
 
     public let selectedLineBackgroundColor = UIColor(namedInModule: "TomorrowCurrentLine")
     public let selectedLinesLineNumberColor = UIColor(namedInModule: "TomorrowForeground")
     public let selectedLinesGutterBackgroundColor: UIColor = .clear
 
-    public let invisibleCharactersColor = UIColor(namedInModule: "TomorrowForeground").withAlphaComponent(0.7)
+    public let invisibleCharactersColor = UIColor(namedInModule: "TomorrowForeground").withAlphaComponent(0.25)
 
     public let pageGuideHairlineColor = UIColor(namedInModule: "TomorrowForeground")
     public let pageGuideBackgroundColor = UIColor(namedInModule: "TomorrowCurrentLine")
@@ -27,7 +27,10 @@ public final class TomorrowTheme: EditorTheme {
     public let markedTextBackgroundColor = UIColor(namedInModule: "TomorrowForeground").withAlphaComponent(0.1)
     public let markedTextBackgroundCornerRadius: CGFloat = 4
 
-    public init() {}
+    public init(size: CGFloat = 14) {
+        font = .monospacedSystemFont(ofSize: size, weight: .regular)
+        lineNumberFont = .monospacedSystemFont(ofSize: size, weight: .regular)
+    }
 
     public func textColor(for rawHighlightName: String) -> UIColor? {
         guard let highlightName = HighlightName(rawHighlightName) else {
