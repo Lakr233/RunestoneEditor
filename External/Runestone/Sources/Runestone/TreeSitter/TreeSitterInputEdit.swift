@@ -13,8 +13,7 @@ final class TreeSitterInputEdit {
          newEndByte: ByteCount,
          startPoint: TreeSitterTextPoint,
          oldEndPoint: TreeSitterTextPoint,
-         newEndPoint: TreeSitterTextPoint)
-    {
+         newEndPoint: TreeSitterTextPoint) {
         self.startByte = startByte
         self.oldEndByte = oldEndByte
         self.newEndByte = newEndByte

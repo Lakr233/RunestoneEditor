@@ -25,14 +25,12 @@ final class LineController {
             }
         }
     }
-
     var theme: Theme = DefaultTheme() {
         didSet {
             syntaxHighlighter?.theme = theme
             applyThemeToAllLineFragmentControllers()
         }
     }
-
     var estimatedLineFragmentHeight: CGFloat = 15
     var tabWidth: CGFloat = 10
     var constrainingWidth: CGFloat {
@@ -43,11 +41,9 @@ final class LineController {
             typesetter.constrainingWidth = newValue
         }
     }
-
     var lineWidth: CGFloat {
         ceil(typesetter.maximumLineWidth)
     }
-
     var lineHeight: CGFloat {
         if let lineHeight = _lineHeight {
             return lineHeight
@@ -65,15 +61,13 @@ final class LineController {
             return lineHeight
         }
     }
-
     var kern: CGFloat = 0 {
         didSet {
             if kern != oldValue {
-                syntaxHighlighter?.kern = kern
+                isDefaultAttributesInvalid = true
             }
         }
     }
-
     var lineBreakMode: LineBreakMode {
         get {
             typesetter.lineBreakMode
@@ -82,15 +76,12 @@ final class LineController {
             typesetter.lineBreakMode = newValue
         }
     }
-
     var numberOfLineFragments: Int {
         typesetter.lineFragments.count
     }
-
     var isFinishedTypesetting: Bool {
         typesetter.isFinishedTypesetting
     }
-
     private(set) var attributedString: NSMutableAttributedString?
 
     private let stringView: StringView
@@ -107,7 +98,7 @@ final class LineController {
     private var _lineHeight: CGFloat?
     private var lineFragmentTree: LineFragmentTree
     private var syntaxHighlighter: LineSyntaxHighlighter? {
-        if let cachedSyntaxHighlighter {
+        if let cachedSyntaxHighlighter = cachedSyntaxHighlighter {
             return cachedSyntaxHighlighter
         } else if let syntaxHighlighter = delegate?.lineSyntaxHighlighter(for: self) {
             syntaxHighlighter.theme = theme
@@ -121,15 +112,14 @@ final class LineController {
     init(line: DocumentLineNode,
          stringView: StringView,
          invisibleCharacterConfiguration: InvisibleCharacterConfiguration,
-         highlightService: HighlightService)
-    {
+         highlightService: HighlightService) {
         self.line = line
         self.stringView = stringView
         self.invisibleCharacterConfiguration = invisibleCharacterConfiguration
         self.highlightService = highlightService
-        typesetter = LineTypesetter(lineID: line.id.rawValue)
+        self.typesetter = LineTypesetter(lineID: line.id.rawValue)
         let rootLineFragmentNodeData = LineFragmentNodeData(lineFragment: nil)
-        lineFragmentTree = LineFragmentTree(minimumValue: 0, rootValue: 0, rootData: rootLineFragmentNodeData)
+        self.lineFragmentTree = LineFragmentTree(minimumValue: 0, rootValue: 0, rootData: rootLineFragmentNodeData)
     }
 
     func prepareToDisplayString(in rect: CGRect, syntaxHighlightAsynchronously: Bool) {
@@ -189,7 +179,7 @@ final class LineController {
     func setMarkedTextOnLineFragments(_ range: NSRange?) {
         for (_, lineFragmentController) in lineFragmentControllers {
             let lineFragment = lineFragmentController.lineFragment
-            if let range, range.overlaps(lineFragment.visibleRange) {
+            if let range = range, range.overlaps(lineFragment.visibleRange) {
                 lineFragmentController.markedRange = range
             } else {
                 lineFragmentController.markedRange = nil
@@ -214,12 +204,13 @@ private extension LineController {
     }
 
     private func typesetLineFragments(_ typesetAmount: TypesetAmount) {
-        let newLineFragments: [LineFragment] = switch typesetAmount {
-        case let .inRect(rect):
-            typesetter.typesetLineFragments(in: rect)
-        case let .toLocation(location):
+        let newLineFragments: [LineFragment]
+        switch typesetAmount {
+        case .inRect(let rect):
+            newLineFragments = typesetter.typesetLineFragments(in: rect)
+        case .toLocation(let location):
             // When typesetting to a location we'll typeset an additional line fragment to ensure that we can display the text surrounding that location.
-            typesetter.typesetLineFragments(toLocation: location, additionalLineFragmentCount: 1)
+            newLineFragments = typesetter.typesetLineFragments(toLocation: location, additionalLineFragmentCount: 1)
         }
         updateLineHeight(for: newLineFragments)
     }
@@ -249,22 +240,17 @@ private extension LineController {
     private func updateDefaultAttributesIfNecessary() {
         if isDefaultAttributesInvalid {
             if let input = createLineSyntaxHighlightInput() {
-                syntaxHighlighter?.setDefaultAttributes(on: input.attributedString)
+                let defaultStringAttributes = DefaultStringAttributes(
+                    textColor: theme.textColor,
+                    font: theme.font,
+                    kern: kern,
+                    tabWidth: tabWidth
+                )
+                defaultStringAttributes.apply(to: input.attributedString)
             }
-            updateParagraphStyle()
             isDefaultAttributesInvalid = false
             isSyntaxHighlightingInvalid = true
             isTypesetterInvalid = true
-        }
-    }
-
-    private func updateParagraphStyle() {
-        if let attributedString {
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.tabStops = []
-            paragraphStyle.defaultTabInterval = tabWidth
-            let range = NSRange(location: 0, length: attributedString.length)
-            attributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
         }
     }
 
@@ -272,7 +258,7 @@ private extension LineController {
         if isTypesetterInvalid {
             lineFragmentTree.reset(rootValue: 0, rootData: LineFragmentNodeData(lineFragment: nil))
             typesetter.reset()
-            if let attributedString {
+            if let attributedString = attributedString {
                 typesetter.prepareToTypeset(attributedString)
             }
             isTypesetterInvalid = false
@@ -283,7 +269,7 @@ private extension LineController {
         guard isSyntaxHighlightingInvalid else {
             return
         }
-        guard let syntaxHighlighter else {
+        guard let syntaxHighlighter = syntaxHighlighter else {
             return
         }
         guard syntaxHighlighter.canHighlight else {
@@ -296,13 +282,13 @@ private extension LineController {
         }
         if async {
             syntaxHighlighter.syntaxHighlight(input) { [weak self] result in
-                if case .success = result, let self {
-                    let oldWidth = lineWidth
-                    isSyntaxHighlightingInvalid = false
-                    isTypesetterInvalid = true
-                    redisplayLineFragments()
-                    if abs(lineWidth - oldWidth) > CGFloat.ulpOfOne {
-                        delegate?.lineControllerDidInvalidateLineWidthDuringAsyncSyntaxHighlight(self)
+                if case .success = result, let self = self {
+                    let oldWidth = self.lineWidth
+                    self.isSyntaxHighlightingInvalid = false
+                    self.isTypesetterInvalid = true
+                    self.redisplayLineFragments()
+                    if abs(self.lineWidth - oldWidth) > CGFloat.ulpOfOne {
+                        self.delegate?.lineControllerDidInvalidateLineWidthDuringAsyncSyntaxHighlight(self)
                     }
                 }
             }
@@ -346,7 +332,7 @@ private extension LineController {
     }
 
     private func createLineSyntaxHighlightInput() -> LineSyntaxHighlighterInput? {
-        if let attributedString {
+        if let attributedString = attributedString {
             let byteRange = line.data.totalByteRange
             return LineSyntaxHighlighterInput(attributedString: attributedString, byteRange: byteRange)
         } else {
@@ -390,14 +376,13 @@ private extension LineController {
     }
 
     private func lineFragmentControllers<T: RedBlackTreeSearchQuery>(matching query: T)
-        -> [LineFragmentController] where T.NodeID == LineFragmentNodeID, T.NodeValue == Int, T.NodeData == LineFragmentNodeData
-    {
+    -> [LineFragmentController] where T.NodeID == LineFragmentNodeID, T.NodeValue == Int, T.NodeData == LineFragmentNodeData {
         let queryResult = lineFragmentTree.search(using: query)
         return queryResult.compactMap { match in
             if let lineFragment = match.node.data.lineFragment {
-                lineFragmentController(for: lineFragment)
+                return lineFragmentController(for: lineFragment)
             } else {
-                nil
+                return nil
             }
         }
     }
@@ -427,7 +412,6 @@ private extension LineController {
 }
 
 // MARK: - UITextInput
-
 extension LineController {
     func caretRect(atIndex lineLocalLocation: Int) -> CGRect {
         for lineFragment in typesetter.lineFragments {
@@ -464,7 +448,6 @@ extension LineController {
 }
 
 // MARK: - LineFragmentControllerDelegate
-
 extension LineController: LineFragmentControllerDelegate {
     func string(in controller: LineFragmentController) -> String? {
         let lineFragment = controller.lineFragment

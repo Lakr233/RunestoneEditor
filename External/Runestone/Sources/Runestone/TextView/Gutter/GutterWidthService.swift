@@ -9,7 +9,6 @@ final class GutterWidthService {
             }
         }
     }
-
     var font = UIFont.monospacedSystemFont(ofSize: 14, weight: .regular) {
         didSet {
             if font != oldValue {
@@ -17,7 +16,6 @@ final class GutterWidthService {
             }
         }
     }
-
     var showLineNumbers = false {
         didSet {
             if showLineNumbers != oldValue {
@@ -25,17 +23,15 @@ final class GutterWidthService {
             }
         }
     }
-
     var gutterLeadingPadding: CGFloat = 0
     var gutterTrailingPadding: CGFloat = 0
     var gutterWidth: CGFloat {
         if showLineNumbers {
-            lineNumberWidth + gutterLeadingPadding + gutterTrailingPadding
+            return lineNumberWidth + gutterLeadingPadding + gutterTrailingPadding
         } else {
-            0
+            return 0
         }
     }
-
     var gutterMinimumCharacterCount: Int? {
         didSet {
             if gutterMinimumCharacterCount != oldValue {
@@ -43,12 +39,11 @@ final class GutterWidthService {
             }
         }
     }
-
     var lineNumberWidth: CGFloat {
         let lineCount = lineManager.lineCount
         let hasLineCountChanged = lineCount != previousLineCount
         let hasFontChanged = font != previousFont
-        if let lineNumberWidth = _lineNumberWidth, !hasLineCountChanged, !hasFontChanged {
+        if let lineNumberWidth = _lineNumberWidth, !hasLineCountChanged && !hasFontChanged {
             return lineNumberWidth
         } else {
             let lineNumberWidth = computeLineNumberWidth()
@@ -59,7 +54,6 @@ final class GutterWidthService {
             return lineNumberWidth
         }
     }
-
     let didUpdateGutterWidth = PassthroughSubject<Void, Never>()
 
     private var _lineNumberWidth: CGFloat?
@@ -80,7 +74,7 @@ private extension GutterWidthService {
     private func computeLineNumberWidth() -> CGFloat {
         let characterCount = "\(lineManager.lineCount)".count
         let wideLineNumberString = String(repeating: "8", count: {
-            if let gutterMinimumCharacterCount, gutterMinimumCharacterCount > characterCount {
+            if let gutterMinimumCharacterCount = gutterMinimumCharacterCount, gutterMinimumCharacterCount > characterCount {
                 return gutterMinimumCharacterCount
             }
             return characterCount

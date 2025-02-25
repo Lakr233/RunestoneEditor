@@ -3,6 +3,10 @@ import UIKit
 final class TextInputStringTokenizer: UITextInputStringTokenizer {
     var lineManager: LineManager
     var stringView: StringView
+    // Used to ensure we can workaround bug where multi-stage input, like when entering Korean text
+    // does not work properly. If we do not treat navigation between word boundies as a special case then
+    // navigating with Shift + Option + Arrow Keys followed by Shift + Arrow Keys will not work correctly.
+    var didCallPositionFromPositionToWordBoundary = false
 
     private let lineControllerStorage: LineControllerStorage
     private var newlineCharacters: [Character] {
@@ -18,48 +22,32 @@ final class TextInputStringTokenizer: UITextInputStringTokenizer {
 
     override func isPosition(_ position: UITextPosition, atBoundary granularity: UITextGranularity, inDirection direction: UITextDirection) -> Bool {
         if granularity == .line {
-            isPosition(position, atLineBoundaryInDirection: direction)
+            return isPosition(position, atLineBoundaryInDirection: direction)
         } else if granularity == .paragraph {
-            isPosition(position, atParagraphBoundaryInDirection: direction)
+            return isPosition(position, atParagraphBoundaryInDirection: direction)
         } else if granularity == .word {
-            isPosition(position, atWordBoundaryInDirection: direction)
+            return isPosition(position, atWordBoundaryInDirection: direction)
         } else {
-            super.isPosition(position, atBoundary: granularity, inDirection: direction)
+            return super.isPosition(position, atBoundary: granularity, inDirection: direction)
         }
-    }
-
-    override func isPosition(_ position: UITextPosition,
-                             withinTextUnit granularity: UITextGranularity,
-                             inDirection direction: UITextDirection) -> Bool
-    {
-        super.isPosition(position, withinTextUnit: granularity, inDirection: direction)
     }
 
     override func position(from position: UITextPosition,
                            toBoundary granularity: UITextGranularity,
-                           inDirection direction: UITextDirection) -> UITextPosition?
-    {
+                           inDirection direction: UITextDirection) -> UITextPosition? {
         if granularity == .line {
-            self.position(from: position, toLineBoundaryInDirection: direction)
+            return self.position(from: position, toLineBoundaryInDirection: direction)
         } else if granularity == .paragraph {
-            self.position(from: position, toParagraphBoundaryInDirection: direction)
+            return self.position(from: position, toParagraphBoundaryInDirection: direction)
         } else if granularity == .word {
-            self.position(from: position, toWordBoundaryInDirection: direction)
+            return self.position(from: position, toWordBoundaryInDirection: direction)
         } else {
-            super.position(from: position, toBoundary: granularity, inDirection: direction)
+            return super.position(from: position, toBoundary: granularity, inDirection: direction)
         }
-    }
-
-    override func rangeEnclosingPosition(_ position: UITextPosition,
-                                         with granularity: UITextGranularity,
-                                         inDirection direction: UITextDirection) -> UITextRange?
-    {
-        super.rangeEnclosingPosition(position, with: granularity, inDirection: direction)
     }
 }
 
 // MARK: - Lines
-
 private extension TextInputStringTokenizer {
     private func isPosition(_ position: UITextPosition, atLineBoundaryInDirection direction: UITextDirection) -> Bool {
         guard let indexedPosition = position as? IndexedPosition else {
@@ -72,7 +60,7 @@ private extension TextInputStringTokenizer {
         let lineLocation = line.location
         let lineLocalLocation = location - lineLocation
         let lineController = lineControllerStorage.getOrCreateLineController(for: line)
-        guard lineLocalLocation >= 0, lineLocalLocation <= line.data.totalLength else {
+        guard lineLocalLocation >= 0 && lineLocalLocation <= line.data.totalLength else {
             return false
         }
         guard let lineFragmentNode = lineController.lineFragmentNode(containingCharacterAt: lineLocalLocation) else {
@@ -129,9 +117,8 @@ private extension TextInputStringTokenizer {
 }
 
 // MARK: - Paragraphs
-
 private extension TextInputStringTokenizer {
-    private func isPosition(_: UITextPosition, atParagraphBoundaryInDirection _: UITextDirection) -> Bool {
+    private func isPosition(_ position: UITextPosition, atParagraphBoundaryInDirection direction: UITextDirection) -> Bool {
         // I can't seem to make Ctrl+A, Ctrl+E, Cmd+Left, and Cmd+Right work properly if this function returns anything but false.
         // I've tried various ways of determining the paragraph boundary but UIKit doesn't seem to be happy with anything I come up with ultimately leading to incorrect keyboard navigation. I haven't yet found any drawbacks to returning false in all cases.
         false
@@ -180,7 +167,6 @@ private extension TextInputStringTokenizer {
 }
 
 // MARK: - Words
-
 private extension TextInputStringTokenizer {
     private func isPosition(_ position: UITextPosition, atWordBoundaryInDirection direction: UITextDirection) -> Bool {
         guard let indexedPosition = position as? IndexedPosition else {
@@ -224,6 +210,7 @@ private extension TextInputStringTokenizer {
         guard let indexedPosition = position as? IndexedPosition else {
             return nil
         }
+        didCallPositionFromPositionToWordBoundary = true
         let location = indexedPosition.index
         let alphanumerics = CharacterSet.alphanumerics
         if direction.isForward {
@@ -274,8 +261,8 @@ private extension TextInputStringTokenizer {
 private extension UITextDirection {
     var isForward: Bool {
         rawValue == UITextStorageDirection.forward.rawValue
-            || rawValue == UITextLayoutDirection.right.rawValue
-            || rawValue == UITextLayoutDirection.down.rawValue
+        || rawValue == UITextLayoutDirection.right.rawValue
+        || rawValue == UITextLayoutDirection.down.rawValue
     }
 }
 

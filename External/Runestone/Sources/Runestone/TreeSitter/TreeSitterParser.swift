@@ -13,7 +13,6 @@ final class TreeSitterParser {
             ts_parser_set_language(pointer, language)
         }
     }
-
     var canParse: Bool {
         language != nil
     }
@@ -22,7 +21,7 @@ final class TreeSitterParser {
 
     init(encoding: TSInputEncoding) {
         self.encoding = encoding
-        pointer = ts_parser_new()
+        self.pointer = ts_parser_new()
     }
 
     deinit {
@@ -40,7 +39,7 @@ final class TreeSitterParser {
         let buffer = string.getAllBytes(withEncoding: stringEncoding, usedLength: &usedLength)
         let newTreePointer = ts_parser_parse_string_encoding(pointer, oldTree?.pointer, buffer, UInt32(usedLength), encoding)
         buffer?.deallocate()
-        if let newTreePointer {
+        if let newTreePointer = newTreePointer {
             return TreeSitterTree(newTreePointer)
         } else {
             return nil
@@ -49,15 +48,15 @@ final class TreeSitterParser {
 
     func parse(oldTree: TreeSitterTree? = nil) -> TreeSitterTree? {
         let input = TreeSitterTextInput(encoding: encoding) { [weak self] byteIndex, _ in
-            if let self {
-                delegate?.parser(self, bytesAt: byteIndex)
+            if let self = self {
+                return self.delegate?.parser(self, bytesAt: byteIndex)
             } else {
-                nil
+                return nil
             }
         }
         let newTreePointer = ts_parser_parse(pointer, oldTree?.pointer, input.makeTSInput())
         input.deallocate()
-        if let newTreePointer {
+        if let newTreePointer = newTreePointer {
             return TreeSitterTree(newTreePointer)
         } else {
             return nil
@@ -66,7 +65,7 @@ final class TreeSitterParser {
 
     @discardableResult
     func setIncludedRanges(_ ranges: [TreeSitterTextRange]) -> Bool {
-        let rawRanges = ranges.map(\.rawValue)
+        let rawRanges = ranges.map { $0.rawValue }
         return rawRanges.withUnsafeBufferPointer { rangesPointer in
             ts_parser_set_included_ranges(pointer, rangesPointer.baseAddress, UInt32(rawRanges.count))
         }
@@ -81,11 +80,11 @@ private extension TSInputEncoding {
     var stringEncoding: String.Encoding? {
         switch self {
         case TSInputEncodingUTF8:
-            .utf8
+            return .utf8
         case TSInputEncodingUTF16:
-            String.preferredUTF16Encoding
+            return String.preferredUTF16Encoding
         default:
-            nil
+            return nil
         }
     }
 }

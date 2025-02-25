@@ -15,14 +15,13 @@ enum LanguageModeFactory {
                 "jsx_element",
                 "jsx_opening_element",
                 "jsx_expression",
-                "switch_body",
+                "switch_body"
             ],
             outdent: [
                 "else",
                 "}",
-                "]",
-            ]
-        )
+                "]"
+            ])
         let language = TreeSitterLanguage(tree_sitter_javascript(), indentationScopes: indentationScopes)
         let languageMode = languageMode(language: language, text: text)
         languageMode.parse(text as NSString)
@@ -56,10 +55,9 @@ enum LanguageModeFactory {
                 "except_clause",
                 "while_statement",
                 "if_statement",
-                "try_statement",
+                "try_statement"
             ],
-            whitespaceDenotesBlocks: true
-        )
+            whitespaceDenotesBlocks: true)
         let language = TreeSitterLanguage(tree_sitter_python(), indentationScopes: indentationScopes)
         let languageMode = languageMode(language: language, text: text)
         languageMode.parse(text as NSString)

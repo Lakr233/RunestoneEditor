@@ -7,7 +7,7 @@ final class TreeSitterTree {
     }
 
     init(_ tree: OpaquePointer) {
-        pointer = tree
+        self.pointer = tree
     }
 
     deinit {

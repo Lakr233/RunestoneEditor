@@ -14,9 +14,9 @@ extension LineSelectionDisplayType {
     var shouldShowLineSelection: Bool {
         switch self {
         case .disabled:
-            false
+            return false
         case .line, .lineFragment:
-            true
+            return true
         }
     }
 }

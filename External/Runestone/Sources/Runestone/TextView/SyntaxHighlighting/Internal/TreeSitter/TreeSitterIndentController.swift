@@ -16,31 +16,30 @@ final class TreeSitterIndentController {
     func strategyForInsertingLineBreak(between startNode: TreeSitterNode?,
                                        and endNode: TreeSitterNode?,
                                        caretStartPosition: LinePosition,
-                                       caretEndPosition: LinePosition) -> InsertLineBreakIndentStrategy
-    {
+                                       caretEndPosition: LinePosition) -> InsertLineBreakIndentStrategy {
         var indentAdjustment = 0
         var outdentAdjustment = 0
         var indentingNode: TreeSitterNode?
         var outdentingNode: TreeSitterNode?
-        if let startNode, let nodeIncreasingIndentLevel = nodeIncreasingIndentLevel(from: startNode, caretPosition: caretStartPosition) {
+        if let startNode = startNode, let nodeIncreasingIndentLevel = nodeIncreasingIndentLevel(from: startNode, caretPosition: caretStartPosition) {
             indentingNode = nodeIncreasingIndentLevel
             indentAdjustment = max(indentLevelAdjustment(from: nodeIncreasingIndentLevel), 0) + 1
         }
-        if let endNode, let nodeDecrasingIndentLevel = nodeDecreasingIndentLevel(from: endNode, caretPosition: caretEndPosition) {
+        if let endNode = endNode, let nodeDecrasingIndentLevel = nodeDecreasingIndentLevel(from: endNode, caretPosition: caretEndPosition) {
             outdentingNode = nodeDecrasingIndentLevel
             outdentAdjustment = min(indentLevelAdjustment(from: nodeDecrasingIndentLevel), 0) - 1
         }
-        if indentAdjustment > 0, outdentAdjustment < 0, let indentingNode {
+        if indentAdjustment > 0 && outdentAdjustment < 0, let indentingNode = indentingNode {
             let currentIndentLevel = indentLevelOfLine(atRow: Int(indentingNode.startPoint.row))
             return InsertLineBreakIndentStrategy(indentLevel: currentIndentLevel + 1, insertExtraLineBreak: true)
-        } else if indentAdjustment > 0, let indentingNode {
+        } else if indentAdjustment > 0, let indentingNode = indentingNode {
             // We preserve the indent level of the previous line so users have a chance to correct any indentation
             // we might have gotten wrong previously and work from that indent level.
             // We only increment the indent level by one, even if the line contains multiple nodes that would
             // increase the indent level. Most users probably don't want to indent a new line multiple times.
             let currentIndentLevel = indentLevelOfLine(atRow: Int(indentingNode.startPoint.row))
             return InsertLineBreakIndentStrategy(indentLevel: currentIndentLevel + 1, insertExtraLineBreak: false)
-        } else if outdentAdjustment < 0, let outdentingNode {
+        } else if outdentAdjustment < 0, let outdentingNode = outdentingNode {
             // Find the starting node.
             var startingNode = outdentingNode
             while startingNode.startPoint.row == outdentingNode.startPoint.row, let parent = startingNode.parent {
@@ -107,7 +106,7 @@ private extension TreeSitterIndentController {
                 //    are children of the "if" node.
                 let shouldNodeIndent = indentationScopes.indent.contains(type) || indentationScopes.inheritIndent.contains(type)
                 let isNodeBeforeTargetPosition = LinePosition(node.startPoint).column < caretPosition.column
-                if shouldNodeIndent, isNodeBeforeTargetPosition {
+                if shouldNodeIndent && isNodeBeforeTargetPosition {
                     return node
                 }
             }

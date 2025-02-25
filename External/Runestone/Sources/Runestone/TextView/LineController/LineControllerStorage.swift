@@ -16,7 +16,7 @@ final class LineControllerStorage {
         }
     }
 
-    private var numberOfLineControllers: Int {
+    fileprivate var numberOfLineControllers: Int {
         lineControllers.count
     }
 

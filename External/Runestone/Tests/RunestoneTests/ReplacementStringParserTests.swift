@@ -158,7 +158,7 @@ final class ReplacementStringParserTests: XCTestCase {
         XCTAssertEqual(parsedReplacementString, .init(components: [
             .text("hello "),
             .placeholder(modifiers: [.uppercaseLetter], index: 1),
-            .text(" world"),
+            .text(" world")
         ]))
     }
 
@@ -170,7 +170,7 @@ final class ReplacementStringParserTests: XCTestCase {
             .placeholder(modifiers: [.uppercaseLetter], index: 1),
             .text(" "),
             .placeholder(modifiers: [.lowercaseAllLetters], index: 2),
-            .text(" world"),
+            .text(" world")
         ]))
     }
 
@@ -180,7 +180,7 @@ final class ReplacementStringParserTests: XCTestCase {
         XCTAssertEqual(parsedReplacementString, .init(components: [
             .text("hello "),
             .placeholder(modifiers: [.uppercaseLetter, .lowercaseLetter, .uppercaseAllLetters], index: 1),
-            .text(" world"),
+            .text(" world")
         ]))
     }
 
@@ -194,7 +194,7 @@ final class ReplacementStringParserTests: XCTestCase {
         let parser = ReplacementStringParser(string: "\\u\\l\\U$1")
         let parsedReplacementString = parser.parse()
         XCTAssertEqual(parsedReplacementString, .init(components: [
-            .placeholder(modifiers: [.uppercaseLetter, .lowercaseLetter, .uppercaseAllLetters], index: 1),
+            .placeholder(modifiers: [.uppercaseLetter, .lowercaseLetter, .uppercaseAllLetters], index: 1)
         ]))
     }
 

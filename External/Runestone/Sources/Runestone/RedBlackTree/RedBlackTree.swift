@@ -9,19 +9,17 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
     var nodeTotalCount: Int {
         root.nodeTotalCount
     }
-
     var nodeTotalValue: NodeValue {
         root.nodeTotalValue
     }
-
     var childrenUpdater: RedBlackTreeChildrenUpdater<NodeID, NodeValue, NodeData>?
 
     private let minimumValue: NodeValue
 
     init(minimumValue: NodeValue, rootValue: NodeValue, rootData: NodeData) {
         self.minimumValue = minimumValue
-        root = Node(tree: self, value: rootValue, data: rootData)
-        root.color = .black
+        self.root = Node(tree: self, value: rootValue, data: rootData)
+        self.root.color = .black
     }
 
     func reset(rootValue: NodeValue, rootData: NodeData) {
@@ -36,13 +34,13 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
     }
 
     func node(containingLocation location: NodeValue) -> Node? {
-        guard location >= minimumValue, location <= root.nodeTotalValue else {
+        guard location >= minimumValue && location <= root.nodeTotalValue else {
             #if DEBUG
-                fatalError("\(location) is out of bounds. Valid range is \(minimumValue) - \(root.nodeTotalValue)."
-                    + " This issue is under investigation. Please open an issue at https://github.com/simonbs/Runestone/issues"
-                    + " and include this stack trace and a sample text file if possible. This fatal error is only thrown in debug builds.")
+            fatalError("\(location) is out of bounds. Valid range is \(minimumValue) - \(root.nodeTotalValue)."
+                       + " This issue is under investigation. Please open an issue at https://github.com/simonbs/Runestone/issues"
+                       + " and include this stack trace and a sample text file if possible. This fatal error is only thrown in debug builds.")
             #else
-                return nil
+            return nil
             #endif
         }
         return node(containingLocation: location, minimumValue: minimumValue, valueKeyPath: \.value, totalValueKeyPath: \.nodeTotalValue)
@@ -51,8 +49,7 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
     func node<T: Comparable & AdditiveArithmetic>(containingLocation location: T,
                                                   minimumValue: T,
                                                   valueKeyPath: KeyPath<Node, T>,
-                                                  totalValueKeyPath: KeyPath<Node, T>) -> Node?
-    {
+                                                  totalValueKeyPath: KeyPath<Node, T>) -> Node? {
         if location == root[keyPath: totalValueKeyPath] {
             return root.rightMost
         } else {
@@ -79,7 +76,7 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
     }
 
     func nodePosition(at location: NodeValue) -> RedBlackTreeNodePosition<NodeValue>? {
-        guard location >= minimumValue, location <= root.nodeTotalValue else {
+        guard location >= minimumValue && location <= root.nodeTotalValue else {
             return nil
         }
         if location == root.nodeTotalValue {
@@ -90,8 +87,7 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
                 nodeStartLocation: nodeStartLocation,
                 index: node.index,
                 offset: offset,
-                value: node.value
-            )
+                value: node.value)
         } else {
             var nodeStartLocation = minimumValue
             var remainingLocation = location
@@ -113,8 +109,7 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
                             nodeStartLocation: nodeStartLocation,
                             index: node.index,
                             offset: offset,
-                            value: node.value
-                        )
+                            value: node.value)
                     } else {
                         node = node.right!
                     }
@@ -206,13 +201,13 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
             let parentNode = removedNode.parent
             let childNode = removedNode.left ?? removedNode.right
             replace(removedNode, with: childNode)
-            if let parentNode {
+            if let parentNode = parentNode {
                 updateAfterChangingChildren(of: parentNode)
             }
             if removedNode.color == .black {
-                if childNode != nil, childNode?.color == .red {
+                if childNode != nil && childNode?.color == .red {
                     childNode?.color = .black
-                } else if let parentNode {
+                } else if let parentNode = parentNode {
                     fixTree(afterDeleting: childNode, parentNode: parentNode)
                 }
             }
@@ -248,9 +243,8 @@ final class RedBlackTree<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNode
     }
 
     func search<T: RedBlackTreeSearchQuery>(using query: T)
-        -> [RedBlackTreeSearchMatch<NodeID, NodeValue, NodeData>]
-        where T.NodeID == NodeID, T.NodeValue == NodeValue, T.NodeData == NodeData
-    {
+    -> [RedBlackTreeSearchMatch<NodeID, NodeValue, NodeData>]
+    where T.NodeID == NodeID, T.NodeValue == NodeValue, T.NodeData == NodeData {
         var matches: [RedBlackTreeSearchMatch<NodeID, NodeValue, NodeData>] = []
         func search(from node: Node) {
             let nodeLowerBound = node.location
@@ -338,10 +332,10 @@ private extension RedBlackTree {
                     fixTree(afterInserting: grandparentNode)
                 } else {
                     // We now know that the parent is red and the uncle is black.
-                    if node === parentNode.right, parentNode === grandparentNode.left {
+                    if node === parentNode.right && parentNode === grandparentNode.left {
                         rotateLeft(parentNode)
                         node = node.left!
-                    } else if node === parentNode.left, parentNode === grandparentNode.right {
+                    } else if node === parentNode.left && parentNode === grandparentNode.right {
                         rotateRight(parentNode)
                         node = node.right!
                     }
@@ -352,7 +346,7 @@ private extension RedBlackTree {
                     parentNode.color = .black
                     grandparentNode.color = .red
                     // Rotate again.
-                    if node === parentNode.left, parentNode === grandparentNode.left {
+                    if node === parentNode.left && parentNode === grandparentNode.left {
                         rotateRight(grandparentNode)
                     } else {
                         assert(node === parentNode.right && parentNode === grandparentNode.right)
@@ -370,7 +364,7 @@ private extension RedBlackTree {
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func fixTree(afterDeleting node: Node?, parentNode: Node) {
         assert(node == nil || node?.parent === parentNode)
-        var sibling = sibling(to: node, through: parentNode)
+        var sibling = self.sibling(to: node, through: parentNode)
         if sibling?.color == .red {
             parentNode.color = .red
             sibling?.color = .black
@@ -382,41 +376,37 @@ private extension RedBlackTree {
             // Update sibling after rotation.
             sibling = self.sibling(to: node, through: parentNode)
         }
-        if parentNode.color == .black,
-           sibling?.color == .black,
-           getColor(of: sibling?.left) == .black,
-           getColor(of: sibling?.right) == .black
-        {
+        if parentNode.color == .black
+            && sibling?.color == .black
+            && getColor(of: sibling?.left) == .black
+            && getColor(of: sibling?.right) == .black {
             sibling?.color = .red
             if let parentNodesParentNode = parentNode.parent {
                 fixTree(afterDeleting: parentNode, parentNode: parentNodesParentNode)
             }
-        } else if parentNode.color == .red,
-                  sibling?.color == .black,
-                  getColor(of: sibling?.left) == .black,
-                  getColor(of: sibling?.right) == .black
-        {
+        } else if parentNode.color == .red
+                    && sibling?.color == .black
+                    && getColor(of: sibling?.left) == .black
+                    && getColor(of: sibling?.right) == .black {
             sibling?.color = .red
             parentNode.color = .black
         } else {
-            if node === parentNode.left,
-               sibling?.color == .black,
-               getColor(of: sibling?.left) == .red,
-               getColor(of: sibling?.right) == .black
-            {
+            if node === parentNode.left
+                && sibling?.color == .black
+                && getColor(of: sibling?.left) == .red
+                && getColor(of: sibling?.right) == .black {
                 sibling?.color = .red
                 sibling?.left?.color = .black
-                if let sibling {
+                if let sibling = sibling {
                     rotateRight(sibling)
                 }
-            } else if node === parentNode.right,
-                      sibling?.color == .black,
-                      getColor(of: sibling?.right) == .red,
-                      getColor(of: sibling?.left) == .black
-            {
+            } else if node === parentNode.right
+                        && sibling?.color == .black
+                        && getColor(of: sibling?.right) == .red
+                        && getColor(of: sibling?.left) == .black {
                 sibling?.color = .red
                 sibling?.right?.color = .black
-                if let sibling {
+                if let sibling = sibling {
                     rotateLeft(sibling)
                 }
             }
@@ -476,9 +466,9 @@ private extension RedBlackTree {
 
     private func sibling(to node: Node) -> Node? {
         if node === node.parent?.left {
-            node.parent?.right
+            return node.parent?.right
         } else {
-            node.parent?.left
+            return node.parent?.left
         }
     }
 
@@ -515,9 +505,9 @@ private extension RedBlackTree {
 
     private func getTreeHeight(nodeCount: Int) -> Int {
         if nodeCount == 0 {
-            0
+            return 0
         } else {
-            getTreeHeight(nodeCount: nodeCount / 2) + 1
+            return getTreeHeight(nodeCount: nodeCount / 2) + 1
         }
     }
 }

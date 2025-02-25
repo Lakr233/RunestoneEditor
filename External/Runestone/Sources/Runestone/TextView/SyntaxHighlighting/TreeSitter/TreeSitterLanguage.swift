@@ -18,7 +18,7 @@ public final class TreeSitterLanguage {
 
     var internalLanguage: TreeSitterInternalLanguage {
         prepare()
-        if let _internalLanguage {
+        if let _internalLanguage = _internalLanguage {
             return _internalLanguage
         } else {
             fatalError("Cannot get internal representation of Tree-sitter language")
@@ -37,9 +37,8 @@ public final class TreeSitterLanguage {
     public init(_ language: UnsafePointer<TSLanguage>,
                 highlightsQuery: TreeSitterLanguage.Query? = nil,
                 injectionsQuery: TreeSitterLanguage.Query? = nil,
-                indentationScopes: TreeSitterIndentationScopes? = nil)
-    {
-        languagePointer = language
+                indentationScopes: TreeSitterIndentationScopes? = nil) {
+        self.languagePointer = language
         self.highlightsQuery = highlightsQuery
         self.injectionsQuery = injectionsQuery
         self.indentationScopes = indentationScopes
@@ -56,12 +55,12 @@ public final class TreeSitterLanguage {
     }
 }
 
-public extension TreeSitterLanguage {
+extension TreeSitterLanguage {
     /// A set of patterns to be matched against the syntax tree. Queries are used for syntax highlighting and detecting injected languages.
     ///
     /// Please refer to Tree-sitter's documentation for more information on queries:
     /// https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries
-    final class Query {
+    public final class Query {
         let string: String?
 
         /// Creates a query with the contents of a provided file.
@@ -100,7 +99,7 @@ private extension TreeSitterInternalLanguage {
                 return try TreeSitterQuery(source: string, language: language)
             } catch {
                 #if DEBUG
-                    print("Invalid TreeSitterLanguage.Query. Error: \(error).")
+                print("Invalid TreeSitterLanguage.Query. Error: \(error).")
                 #endif
                 return nil
             }

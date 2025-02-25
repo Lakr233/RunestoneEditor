@@ -8,7 +8,6 @@ final class HighlightService {
             }
         }
     }
-
     var highlightedRanges: [HighlightedRange] = [] {
         didSet {
             if highlightedRanges != oldValue {
@@ -71,8 +70,7 @@ private extension HighlightService {
     }
 
     private func createHighlightedLineFragments(for lineFragment: LineFragment,
-                                                inLineWithID lineID: DocumentLineNodeID) -> [HighlightedRangeFragment]
-    {
+                                                inLineWithID lineID: DocumentLineNodeID) -> [HighlightedRangeFragment] {
         guard let lineHighlightedRangeFragments = highlightedRangeFragmentsPerLine[lineID] else {
             return []
         }

@@ -3,9 +3,9 @@ import Foundation
 final class TreeSitterTextPredicatesEvaluator {
     private let match: TreeSitterQueryMatch
     private let stringView: StringView
-    #if DEBUG
-        static var previousUnsupportedPredicateNames: [String] = []
-    #endif
+#if DEBUG
+    static var previousUnsupportedPredicateNames: [String] = []
+#endif
 
     init(match: TreeSitterQueryMatch, stringView: StringView) {
         self.match = match
@@ -18,25 +18,25 @@ final class TreeSitterTextPredicatesEvaluator {
         }
         for textPredicate in capture.textPredicates {
             switch textPredicate {
-            case let .captureEqualsString(parameters):
+            case .captureEqualsString(let parameters):
                 if !evaluate(using: parameters) {
                     return false
                 }
-            case let .captureEqualsCapture(parameters):
+            case .captureEqualsCapture(let parameters):
                 if !evaluate(using: parameters) {
                     return false
                 }
-            case let .captureMatchesPattern(parameters):
+            case .captureMatchesPattern(let parameters):
                 if !evaluate(using: parameters) {
                     return false
                 }
-            case let .unsupported(parameters):
+            case .unsupported(let parameters):
                 #if DEBUG
-                    if !Self.previousUnsupportedPredicateNames.contains(parameters.name) {
-                        Self.previousUnsupportedPredicateNames.append(parameters.name)
-                        print("Unsupported predicate '\(parameters.name)'."
-                            + " This message is only printed once and only when running in the debug configuration.")
-                    }
+                if !Self.previousUnsupportedPredicateNames.contains(parameters.name) {
+                    Self.previousUnsupportedPredicateNames.append(parameters.name)
+                    print("Unsupported predicate '\(parameters.name)'."
+                          + " This message is only printed once and only when running in the debug configuration.")
+                }
                 #endif
                 return false
             }

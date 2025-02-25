@@ -18,8 +18,7 @@ final class ViewReuseQueue<Key: Hashable, View: UIView & ReusableView> {
             self,
             selector: #selector(clearMemory),
             name: UIApplication.didReceiveMemoryWarningNotification,
-            object: nil
-        )
+            object: nil)
     }
 
     deinit {

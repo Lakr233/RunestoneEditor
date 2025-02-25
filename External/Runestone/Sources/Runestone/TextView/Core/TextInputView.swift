@@ -23,13 +23,12 @@ protocol TextInputViewDelegate: AnyObject {
 // swiftlint:disable:next type_body_length
 final class TextInputView: UIView, UITextInput {
     // MARK: - UITextInput
-
     var selectedTextRange: UITextRange? {
         get {
             if let range = _selectedRange {
-                IndexedRange(range)
+                return IndexedRange(range)
             } else {
-                nil
+                return nil
             }
         }
         set {
@@ -48,6 +47,16 @@ final class TextInputView: UIView, UITextInput {
                     shouldNotifyInputDelegate = true
                     didCallPositionFromPositionInDirectionWithOffset = false
                 }
+                // This is a consequence of our workaround that ensures multi-stage input, such as when entering Korean,
+                // works correctly. The workaround causes bugs when selecting words using Shift + Option + Arrow Keys
+                // followed by Shift + Arrow Keys if we do not treat it as a special case.
+                // The consequence of not having this workaround is that Shift + Arrow Keys may adjust the wrong end of
+                // the selected text when followed by navigating between word boundaries usign Shift + Option + Arrow Keys.
+                if customTokenizer.didCallPositionFromPositionToWordBoundary && !didCallDeleteBackward {
+                    shouldNotifyInputDelegate = true
+                    customTokenizer.didCallPositionFromPositionToWordBoundary = false
+                }
+                didCallDeleteBackward = false
                 notifyInputDelegateAboutSelectionChangeInLayoutSubviews = !shouldNotifyInputDelegate
                 if shouldNotifyInputDelegate {
                     inputDelegate?.selectionWillChange(self)
@@ -59,38 +68,32 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     private(set) var markedTextRange: UITextRange? {
         get {
-            if let markedRange {
-                IndexedRange(markedRange)
+            if let markedRange = markedRange {
+                return IndexedRange(markedRange)
             } else {
-                nil
+                return nil
             }
         }
         set {
             markedRange = (newValue as? IndexedRange)?.range.nonNegativeLength
         }
     }
-
     var markedTextStyle: [NSAttributedString.Key: Any]?
     var beginningOfDocument: UITextPosition {
         IndexedPosition(index: 0)
     }
-
     var endOfDocument: UITextPosition {
         IndexedPosition(index: string.length)
     }
-
     weak var inputDelegate: UITextInputDelegate?
     var hasText: Bool {
         string.length > 0
     }
-
     var tokenizer: UITextInputTokenizer {
         customTokenizer
     }
-
     private lazy var customTokenizer = TextInputStringTokenizer(textInput: self,
                                                                 stringView: stringView,
                                                                 lineManager: lineManager,
@@ -111,7 +114,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     @objc var selectionBarColor: UIColor = .label {
         didSet {
             if selectionBarColor != oldValue {
@@ -119,7 +121,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     @objc var selectionHighlightColor: UIColor = .label.withAlphaComponent(0.2) {
         didSet {
             if selectionHighlightColor != oldValue {
@@ -127,7 +128,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var isEditing = false {
         didSet {
             if isEditing != oldValue {
@@ -135,19 +135,16 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     override var undoManager: UndoManager? {
         timedUndoManager
     }
 
     // MARK: - Appearance
-
     var theme: Theme {
         didSet {
             applyThemeToChildren()
         }
     }
-
     var showLineNumbers = false {
         didSet {
             if showLineNumbers != oldValue {
@@ -159,7 +156,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var lineSelectionDisplayType: LineSelectionDisplayType {
         get {
             layoutManager.lineSelectionDisplayType
@@ -168,7 +164,6 @@ final class TextInputView: UIView, UITextInput {
             layoutManager.lineSelectionDisplayType = newValue
         }
     }
-
     var showTabs: Bool {
         get {
             invisibleCharacterConfiguration.showTabs
@@ -180,7 +175,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var showSpaces: Bool {
         get {
             invisibleCharacterConfiguration.showSpaces
@@ -192,7 +186,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var showNonBreakingSpaces: Bool {
         get {
             invisibleCharacterConfiguration.showNonBreakingSpaces
@@ -204,7 +197,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var showLineBreaks: Bool {
         get {
             invisibleCharacterConfiguration.showLineBreaks
@@ -219,7 +211,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var showSoftLineBreaks: Bool {
         get {
             invisibleCharacterConfiguration.showSoftLineBreaks
@@ -234,7 +225,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var tabSymbol: String {
         get {
             invisibleCharacterConfiguration.tabSymbol
@@ -246,7 +236,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var spaceSymbol: String {
         get {
             invisibleCharacterConfiguration.spaceSymbol
@@ -258,7 +247,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var nonBreakingSpaceSymbol: String {
         get {
             invisibleCharacterConfiguration.nonBreakingSpaceSymbol
@@ -270,7 +258,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var lineBreakSymbol: String {
         get {
             invisibleCharacterConfiguration.lineBreakSymbol
@@ -282,7 +269,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var softLineBreakSymbol: String {
         get {
             invisibleCharacterConfiguration.softLineBreakSymbol
@@ -294,7 +280,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var indentStrategy: IndentStrategy = .tab(length: 2) {
         didSet {
             if indentStrategy != oldValue {
@@ -305,7 +290,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var gutterLeadingPadding: CGFloat = 3 {
         didSet {
             if gutterLeadingPadding != oldValue {
@@ -315,7 +299,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var gutterTrailingPadding: CGFloat = 3 {
         didSet {
             if gutterTrailingPadding != oldValue {
@@ -325,7 +308,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var gutterMinimumCharacterCount: Int = 1 {
         didSet {
             if gutterMinimumCharacterCount != oldValue {
@@ -335,7 +317,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var textContainerInset: UIEdgeInsets {
         get {
             layoutManager.textContainerInset
@@ -351,7 +332,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var isLineWrappingEnabled: Bool {
         get {
             layoutManager.isLineWrappingEnabled
@@ -366,7 +346,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var lineBreakMode: LineBreakMode = .byWordWrapping {
         didSet {
             if lineBreakMode != oldValue {
@@ -377,11 +356,9 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var gutterWidth: CGFloat {
         gutterWidthService.gutterWidth
     }
-
     var lineHeightMultiplier: CGFloat = 1 {
         didSet {
             if lineHeightMultiplier != oldValue {
@@ -394,7 +371,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var kern: CGFloat = 0 {
         didSet {
             if kern != oldValue {
@@ -406,13 +382,11 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var characterPairs: [CharacterPair] = [] {
         didSet {
             maximumLeadingCharacterPairComponentLength = characterPairs.map(\.leading.utf16.count).max() ?? 0
         }
     }
-
     var characterPairTrailingComponentDeletionMode: CharacterPairTrailingComponentDeletionMode = .disabled
     var showPageGuide = false {
         didSet {
@@ -428,7 +402,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var pageGuideColumn: Int {
         get {
             pageGuideController.column
@@ -440,11 +413,9 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     private var estimatedLineHeight: CGFloat {
         theme.font.totalLineHeight * lineHeightMultiplier
     }
-
     var highlightedRanges: [HighlightedRange] {
         get {
             highlightService.highlightedRanges
@@ -459,7 +430,6 @@ final class TextInputView: UIView, UITextInput {
     }
 
     // MARK: - Contents
-
     weak var delegate: TextInputViewDelegate?
     var string: NSString {
         get {
@@ -486,7 +456,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var viewport: CGRect {
         get {
             layoutManager.viewport
@@ -499,7 +468,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var scrollViewWidth: CGFloat = 0 {
         didSet {
             if scrollViewWidth != oldValue {
@@ -511,11 +479,9 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var contentSize: CGSize {
         contentSizeService.contentSize
     }
-
     var selectedRange: NSRange? {
         get {
             _selectedRange
@@ -527,7 +493,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     private var _selectedRange: NSRange? {
         didSet {
             if _selectedRange != oldValue {
@@ -537,11 +502,9 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     override var canBecomeFirstResponder: Bool {
         true
     }
-
     weak var gutterParentView: UIView? {
         get {
             layoutManager.gutterParentView
@@ -550,7 +513,6 @@ final class TextInputView: UIView, UITextInput {
             layoutManager.gutterParentView = newValue
         }
     }
-
     var scrollViewSafeAreaInsets: UIEdgeInsets = .zero {
         didSet {
             if scrollViewSafeAreaInsets != oldValue {
@@ -558,11 +520,9 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var gutterContainerView: UIView {
         layoutManager.gutterContainerView
     }
-
     private(set) var stringView = StringView() {
         didSet {
             if stringView !== oldValue {
@@ -577,7 +537,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     private(set) var lineManager: LineManager {
         didSet {
             if lineManager !== oldValue {
@@ -592,16 +551,13 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     var viewHierarchyContainsCaret: Bool {
         textSelectionView?.subviews.count == 1
     }
-
     var lineEndings: LineEnding = .lf
     private(set) var isRestoringPreviouslyDeletedText = false
 
     // MARK: - Private
-
     private var languageMode: InternalLanguageMode = PlainTextInternalLanguageMode() {
         didSet {
             if languageMode !== oldValue {
@@ -612,7 +568,6 @@ final class TextInputView: UIView, UITextInput {
             }
         }
     }
-
     private let lineControllerFactory: LineControllerFactory
     private let lineControllerStorage: LineControllerStorage
     private let layoutManager: LayoutManager
@@ -634,29 +589,27 @@ final class TextInputView: UIView, UITextInput {
             layoutManager.markedRange = newValue
         }
     }
-
     private var floatingCaretView: FloatingCaretView?
     private var insertionPointColorBeforeFloatingBegan: UIColor = .label
     private var maximumLeadingCharacterPairComponentLength = 0
     private var textSelectionView: UIView? {
         if let klass = NSClassFromString("UITextSelectionView") {
-            subviews.first { $0.isKind(of: klass) }
+            return subviews.first { $0.isKind(of: klass) }
         } else {
-            nil
+            return nil
         }
     }
-
     private var hasPendingFullLayout = false
     private let editMenuController = EditMenuController()
     private var notifyInputDelegateAboutSelectionChangeInLayoutSubviews = false
     private var notifyDelegateAboutSelectionChangeInLayoutSubviews = false
     private var didCallPositionFromPositionInDirectionWithOffset = false
+    private var didCallDeleteBackward = false
     private var hasDeletedTextWithPendingLayoutSubviews = false
     private var preserveUndoStackWhenSettingString = false
     private var cancellables: [AnyCancellable] = []
 
     // MARK: - Lifecycle
-
     init(theme: Theme) {
         self.theme = theme
         lineManager = LineManager(stringView: stringView)
@@ -736,8 +689,7 @@ final class TextInputView: UIView, UITextInput {
         return didResignFirstResponder
     }
 
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -760,14 +712,14 @@ final class TextInputView: UIView, UITextInput {
         }
     }
 
-    override func copy(_: Any?) {
-        if let selectedTextRange, let text = text(in: selectedTextRange) {
+    override func copy(_ sender: Any?) {
+        if let selectedTextRange = selectedTextRange, let text = text(in: selectedTextRange) {
             UIPasteboard.general.string = text
         }
     }
 
-    override func paste(_: Any?) {
-        if let selectedTextRange, let string = UIPasteboard.general.string {
+    override func paste(_ sender: Any?) {
+        if let selectedTextRange = selectedTextRange, let string = UIPasteboard.general.string {
             inputDelegate?.selectionWillChange(self)
             let preparedText = prepareTextForInsertion(string)
             replace(selectedTextRange, withText: preparedText)
@@ -775,14 +727,14 @@ final class TextInputView: UIView, UITextInput {
         }
     }
 
-    override func cut(_: Any?) {
-        if let selectedTextRange, let text = text(in: selectedTextRange) {
+    override func cut(_ sender: Any?) {
+        if let selectedTextRange = selectedTextRange, let text = text(in: selectedTextRange) {
             UIPasteboard.general.string = text
             replace(selectedTextRange, withText: "")
         }
     }
 
-    override func selectAll(_: Any?) {
+    override func selectAll(_ sender: Any?) {
         notifyInputDelegateAboutSelectionChangeInLayoutSubviews = true
         selectedRange = NSRange(location: 0, length: string.length)
     }
@@ -801,31 +753,31 @@ final class TextInputView: UIView, UITextInput {
 
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         if action == #selector(copy(_:)) {
-            if let selectedTextRange {
-                !selectedTextRange.isEmpty
+            if let selectedTextRange = selectedTextRange {
+                return !selectedTextRange.isEmpty
             } else {
-                false
+                return false
             }
         } else if action == #selector(cut(_:)) {
-            if let selectedTextRange {
-                isEditing && !selectedTextRange.isEmpty
+            if let selectedTextRange = selectedTextRange {
+                return isEditing && !selectedTextRange.isEmpty
             } else {
-                false
+                return false
             }
         } else if action == #selector(paste(_:)) {
-            isEditing && UIPasteboard.general.hasStrings
+            return isEditing && UIPasteboard.general.hasStrings
         } else if action == #selector(selectAll(_:)) {
-            true
+            return true
         } else if action == #selector(replace(_:)) {
-            true
+            return true
         } else if action == NSSelectorFromString("replaceTextInSelectedHighlightedRange") {
-            if let selectedRange, let highlightedRange = highlightedRange(for: selectedRange) {
-                delegate?.textInputView(self, canReplaceTextIn: highlightedRange) ?? false
+            if let selectedRange = selectedRange, let highlightedRange = highlightedRange(for: selectedRange) {
+                return delegate?.textInputView(self, canReplaceTextIn: highlightedRange) ?? false
             } else {
-                false
+                return false
             }
         } else {
-            super.canPerformAction(action, withSender: sender)
+            return super.canPerformAction(action, withSender: sender)
         }
     }
 
@@ -883,15 +835,14 @@ final class TextInputView: UIView, UITextInput {
         let internalLanguageMode = InternalLanguageModeFactory.internalLanguageMode(
             from: languageMode,
             stringView: stringView,
-            lineManager: lineManager
-        )
+            lineManager: lineManager)
         self.languageMode = internalLanguageMode
         layoutManager.languageMode = internalLanguageMode
         internalLanguageMode.parse(string) { [weak self] finished in
-            if let self, finished {
-                invalidateLines()
-                layoutManager.setNeedsLayout()
-                layoutManager.layoutIfNeeded()
+            if let self = self, finished {
+                self.invalidateLines()
+                self.layoutManager.setNeedsLayout()
+                self.layoutManager.layoutIfNeeded()
             }
             completion?(finished)
         }
@@ -899,9 +850,9 @@ final class TextInputView: UIView, UITextInput {
 
     func syntaxNode(at location: Int) -> SyntaxNode? {
         if let linePosition = lineManager.linePosition(at: location) {
-            languageMode.syntaxNode(at: linePosition)
+            return languageMode.syntaxNode(at: linePosition)
         } else {
-            nil
+            return nil
         }
     }
 
@@ -936,7 +887,7 @@ final class TextInputView: UIView, UITextInput {
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
-        if hasPendingFullLayout, window != nil {
+        if hasPendingFullLayout && window != nil {
             hasPendingFullLayout = false
             performFullLayout()
         }
@@ -970,7 +921,6 @@ final class TextInputView: UIView, UITextInput {
 }
 
 // MARK: - Theming
-
 private extension TextInputView {
     private func applyThemeToChildren() {
         gutterWidthService.font = theme.lineNumberFont
@@ -985,13 +935,12 @@ private extension TextInputView {
 }
 
 // MARK: - Navigation
-
 private extension TextInputView {
     private func handleKeyPressDuringMultistageTextInput(keyCode: UIKeyboardHIDUsage) {
         // When editing multistage text input (that is, we have a marked text) we let the user unmark the text
         // by pressing the arrow keys or Escape. This isn't common in iOS apps but it's the default behavior
         // on macOS and I think that works quite well for plain text editors on iOS too.
-        guard let markedRange, let markedText = stringView.substring(in: markedRange) else {
+        guard let markedRange = markedRange, let markedText = stringView.substring(in: markedRange) else {
             return
         }
         // We only unmark the text if the marked text contains specific characters only.
@@ -1022,7 +971,7 @@ private extension TextInputView {
     }
 
     private func navigate(in direction: UITextLayoutDirection, offset: Int) {
-        if let selectedRange {
+        if let selectedRange = selectedRange {
             if let location = lineMovementController.location(from: selectedRange.location, in: direction, offset: offset) {
                 self.selectedRange = NSRange(location: location, length: 0)
             }
@@ -1031,7 +980,6 @@ private extension TextInputView {
 }
 
 // MARK: - Layout
-
 private extension TextInputView {
     private func layoutPageGuideIfNeeded() {
         if showPageGuide {
@@ -1064,34 +1012,33 @@ private extension TextInputView {
 
     private func setupContentSizeObserver() {
         contentSizeService.$isContentSizeInvalid.filter { $0 }.sink { [weak self] _ in
-            if let self {
-                delegate?.textInputViewDidInvalidateContentSize(self)
+            if let self = self {
+                self.delegate?.textInputViewDidInvalidateContentSize(self)
             }
         }.store(in: &cancellables)
     }
 
     private func setupGutterWidthObserver() {
         gutterWidthService.didUpdateGutterWidth.sink { [weak self] in
-            if let self {
+            if let self = self {
                 // Typeset lines again when the line number width changes since changing line number width may increase or reduce the number of line fragments in a line.
-                setNeedsLayout()
-                invalidateLines()
-                layoutManager.setNeedsLayout()
-                delegate?.textInputViewDidChangeGutterWidth(self)
+                self.setNeedsLayout()
+                self.invalidateLines()
+                self.layoutManager.setNeedsLayout()
+                self.delegate?.textInputViewDidChangeGutterWidth(self)
             }
         }.store(in: &cancellables)
     }
 }
 
 // MARK: - Floating Caret
-
 extension TextInputView {
     func beginFloatingCursor(at point: CGPoint) {
         if floatingCaretView == nil, let position = closestPosition(to: point) {
             insertionPointColorBeforeFloatingBegan = insertionPointColor
             insertionPointColor = insertionPointColorBeforeFloatingBegan.withAlphaComponent(0.5)
             updateCaretColor()
-            let caretRect = caretRect(for: position)
+            let caretRect = self.caretRect(for: position)
             let caretOrigin = CGPoint(x: point.x - caretRect.width / 2, y: point.y - caretRect.height / 2)
             let floatingCaretView = FloatingCaretView()
             floatingCaretView.backgroundColor = insertionPointColorBeforeFloatingBegan
@@ -1103,7 +1050,7 @@ extension TextInputView {
     }
 
     func updateFloatingCursor(at point: CGPoint) {
-        if let floatingCaretView {
+        if let floatingCaretView = floatingCaretView {
             let caretSize = floatingCaretView.frame.size
             let caretOrigin = CGPoint(x: point.x - caretSize.width / 2, y: point.y - caretSize.height / 2)
             floatingCaretView.frame = CGRect(origin: caretOrigin, size: caretSize)
@@ -1120,7 +1067,7 @@ extension TextInputView {
 
     private func updateCaretColor() {
         // Removing the UITextSelectionView and re-adding it forces it to query the insertion point color.
-        if let textSelectionView {
+        if let textSelectionView = textSelectionView {
             textSelectionView.removeFromSuperview()
             addSubview(textSelectionView)
         }
@@ -1128,7 +1075,6 @@ extension TextInputView {
 }
 
 // MARK: - Rects
-
 extension TextInputView {
     func caretRect(for position: UITextPosition) -> CGRect {
         guard let indexedPosition = position as? IndexedPosition else {
@@ -1150,7 +1096,6 @@ extension TextInputView {
 }
 
 // MARK: - Editing
-
 extension TextInputView {
     func insertText(_ text: String) {
         let preparedText = prepareTextForInsertion(text)
@@ -1182,6 +1127,7 @@ extension TextInputView {
     }
 
     func deleteBackward() {
+        didCallDeleteBackward = true
         guard let selectedRange = markedRange ?? selectedRange, selectedRange.length > 0 else {
             return
         }
@@ -1207,10 +1153,11 @@ extension TextInputView {
         notifyInputDelegateAboutSelectionChangeInLayoutSubviews = false
         // Just before calling deleteBackward(), UIKit will set the selected range to a range of length 1, if the selected range has a length of 0.
         // In that case we want to undo to a selected range of length 0, so we construct our range here and pass it all the way to the undo operation.
-        let selectedRangeAfterUndo: NSRange = if deleteRange.length == 1 {
-            NSRange(location: selectedRange.upperBound, length: 0)
+        let selectedRangeAfterUndo: NSRange
+        if deleteRange.length == 1 {
+            selectedRangeAfterUndo = NSRange(location: selectedRange.upperBound, length: 0)
         } else {
-            selectedRange
+            selectedRangeAfterUndo = selectedRange
         }
         let isDeletingMultipleCharacters = selectedRange.length > 1
         if isDeletingMultipleCharacters {
@@ -1245,7 +1192,7 @@ extension TextInputView {
         let textEditHelper = TextEditHelper(stringView: stringView, lineManager: lineManager, lineEndings: lineEndings)
         let newString = textEditHelper.string(byApplying: batchReplaceSet)
         setStringWithUndoAction(newString)
-        if let oldLinePosition {
+        if let oldLinePosition = oldLinePosition {
             // By restoring the selected range using the old line position we can better preserve the old selected language.
             moveCaret(to: oldLinePosition)
         }
@@ -1253,9 +1200,9 @@ extension TextInputView {
 
     func text(in range: UITextRange) -> String? {
         if let indexedRange = range as? IndexedRange {
-            text(in: indexedRange.range.nonNegativeLength)
+            return text(in: indexedRange.range.nonNegativeLength)
         } else {
-            nil
+            return nil
         }
     }
 
@@ -1282,7 +1229,7 @@ extension TextInputView {
         }
         timedUndoManager.endUndoGrouping()
         delegate?.textInputViewDidChange(self)
-        if let oldSelectedRange {
+        if let oldSelectedRange = oldSelectedRange {
             selectedRange = safeSelectionRange(from: oldSelectedRange)
         }
     }
@@ -1295,10 +1242,9 @@ extension TextInputView {
             resultingRange = string.customRangeOfComposedCharacterSequences(for: range)
         }
         // If deleting the leading component of a character pair we may also expand the range to delete the trailing component.
-        if characterPairTrailingComponentDeletionMode == .immediatelyFollowingLeadingComponent,
-           maximumLeadingCharacterPairComponentLength > 0,
-           resultingRange.length <= maximumLeadingCharacterPairComponentLength
-        {
+        if characterPairTrailingComponentDeletionMode == .immediatelyFollowingLeadingComponent
+            && maximumLeadingCharacterPairComponentLength > 0
+            && resultingRange.length <= maximumLeadingCharacterPairComponentLength {
             let stringToDelete = stringView.substring(in: resultingRange)
             if let characterPair = characterPairs.first(where: { $0.leading == stringToDelete }) {
                 let trailingComponentLength = characterPair.trailing.utf16.count
@@ -1315,8 +1261,7 @@ extension TextInputView {
     private func replaceText(in range: NSRange,
                              with newString: String,
                              selectedRangeAfterUndo: NSRange? = nil,
-                             undoActionName: String = L10n.Undo.ActionName.typing)
-    {
+                             undoActionName: String = L10n.Undo.ActionName.typing) {
         let nsNewString = newString as NSString
         let currentText = text(in: range) ?? ""
         let newRange = NSRange(location: range.location, length: nsNewString.length)
@@ -1361,8 +1306,7 @@ extension TextInputView {
     private func addUndoOperation(replacing range: NSRange,
                                   withText text: String,
                                   selectedRangeAfterUndo: NSRange? = nil,
-                                  actionName: String = L10n.Undo.ActionName.typing)
-    {
+                                  actionName: String = L10n.Undo.ActionName.typing) {
         let oldSelectedRange = selectedRangeAfterUndo ?? selectedRange
         timedUndoManager.beginUndoGrouping()
         timedUndoManager.setActionName(actionName)
@@ -1386,13 +1330,12 @@ extension TextInputView {
 }
 
 // MARK: - Selection
-
 extension TextInputView {
     func selectionRects(for range: UITextRange) -> [UITextSelectionRect] {
         if let indexedRange = range as? IndexedRange {
-            selectionRectService.selectionRects(in: indexedRange.range.nonNegativeLength)
+            return selectionRectService.selectionRects(in: indexedRange.range.nonNegativeLength)
         } else {
-            []
+            return []
         }
     }
 
@@ -1422,10 +1365,9 @@ extension TextInputView {
 }
 
 // MARK: - Indent and Outdent
-
 extension TextInputView {
     func shiftLeft() {
-        if let selectedRange {
+        if let selectedRange = selectedRange {
             inputDelegate?.textWillChange(self)
             indentController.shiftLeft(in: selectedRange)
             inputDelegate?.textDidChange(self)
@@ -1433,7 +1375,7 @@ extension TextInputView {
     }
 
     func shiftRight() {
-        if let selectedRange {
+        if let selectedRange = selectedRange {
             inputDelegate?.textWillChange(self)
             indentController.shiftRight(in: selectedRange)
             inputDelegate?.textDidChange(self)
@@ -1442,7 +1384,6 @@ extension TextInputView {
 }
 
 // MARK: - Move Lines
-
 extension TextInputView {
     func moveSelectedLinesUp() {
         moveSelectedLine(byOffset: -1, undoActionName: L10n.Undo.ActionName.moveLinesUp)
@@ -1471,7 +1412,6 @@ extension TextInputView {
 }
 
 // MARK: - Marking
-
 extension TextInputView {
     func setMarkedText(_ markedText: String?, selectedRange: NSRange) {
         guard let range = markedRange ?? self.selectedRange else {
@@ -1500,7 +1440,6 @@ extension TextInputView {
 }
 
 // MARK: - Ranges and Positions
-
 extension TextInputView {
     func position(within range: UITextRange, farthestIn direction: UITextLayoutDirection) -> UITextPosition? {
         // This implementation seems to match the behavior of UITextView.
@@ -1556,9 +1495,9 @@ extension TextInputView {
 
     func closestPosition(to point: CGPoint) -> UITextPosition? {
         if let index = layoutManager.closestIndex(to: point) {
-            IndexedPosition(index: index)
+            return IndexedPosition(index: index)
         } else {
-            nil
+            return nil
         }
     }
 
@@ -1588,7 +1527,7 @@ extension TextInputView {
             return nil
         }
         let newPosition = indexedPosition.index + offset
-        guard newPosition >= 0, newPosition <= string.length else {
+        guard newPosition >= 0 && newPosition <= string.length else {
             return nil
         }
         return IndexedPosition(index: newPosition)
@@ -1597,10 +1536,10 @@ extension TextInputView {
     func compare(_ position: UITextPosition, to other: UITextPosition) -> ComparisonResult {
         guard let indexedPosition = position as? IndexedPosition, let otherIndexedPosition = other as? IndexedPosition else {
             #if targetEnvironment(macCatalyst)
-                // Mac Catalyst may pass <uninitialized> to `position`. I'm not sure what the right way to deal with that is but returning .orderedSame seems to work.
-                return .orderedSame
+            // Mac Catalyst may pass <uninitialized> to `position`. I'm not sure what the right way to deal with that is but returning .orderedSame seems to work.
+            return .orderedSame
             #else
-                fatalError("Positions must be of type \(IndexedPosition.self)")
+            fatalError("Positions must be of type \(IndexedPosition.self)")
             #endif
         }
         if indexedPosition.index < otherIndexedPosition.index {
@@ -1614,25 +1553,23 @@ extension TextInputView {
 
     func offset(from: UITextPosition, to toPosition: UITextPosition) -> Int {
         if let fromPosition = from as? IndexedPosition, let toPosition = toPosition as? IndexedPosition {
-            toPosition.index - fromPosition.index
+            return toPosition.index - fromPosition.index
         } else {
-            0
+            return 0
         }
     }
 }
 
 // MARK: - Writing Direction
-
 extension TextInputView {
-    func baseWritingDirection(for _: UITextPosition, in _: UITextStorageDirection) -> NSWritingDirection {
+    func baseWritingDirection(for position: UITextPosition, in direction: UITextStorageDirection) -> NSWritingDirection {
         .natural
     }
 
-    func setBaseWritingDirection(_: NSWritingDirection, for _: UITextRange) {}
+    func setBaseWritingDirection(_ writingDirection: NSWritingDirection, for range: UITextRange) {}
 }
 
 // MARK: - UIEditMenuInteraction
-
 extension TextInputView {
     func editMenu(for textRange: UITextRange, suggestedActions: [UIMenuElement]) -> UIMenu? {
         editMenuController.editMenu(for: textRange, suggestedActions: suggestedActions)
@@ -1643,7 +1580,7 @@ extension TextInputView {
     }
 
     @objc private func replaceTextInSelectedHighlightedRange() {
-        if let selectedRange, let highlightedRange = highlightedRange(for: selectedRange) {
+        if let selectedRange = selectedRange, let highlightedRange = highlightedRange(for: selectedRange) {
             delegate?.textInputView(self, replaceTextIn: highlightedRange)
         }
     }
@@ -1654,13 +1591,12 @@ extension TextInputView {
 }
 
 // MARK: - TreeSitterLanguageModeDeleage
-
 extension TextInputView: TreeSitterLanguageModeDelegate {
-    func treeSitterLanguageMode(_: TreeSitterInternalLanguageMode, bytesAt byteIndex: ByteCount) -> TreeSitterTextProviderResult? {
-        guard byteIndex.value >= 0, byteIndex < stringView.string.byteCount else {
+    func treeSitterLanguageMode(_ languageMode: TreeSitterInternalLanguageMode, bytesAt byteIndex: ByteCount) -> TreeSitterTextProviderResult? {
+        guard byteIndex.value >= 0 && byteIndex < stringView.string.byteCount else {
             return nil
         }
-        let targetByteCount: ByteCount = 4 * 1024
+        let targetByteCount: ByteCount = 4 * 1_024
         let endByte = min(byteIndex + targetByteCount, stringView.string.byteCount)
         let byteRange = ByteRange(from: byteIndex, to: endByte)
         if let result = stringView.bytes(in: byteRange) {
@@ -1672,9 +1608,8 @@ extension TextInputView: TreeSitterLanguageModeDelegate {
 }
 
 // MARK: - LineControllerStorageDelegate
-
 extension TextInputView: LineControllerStorageDelegate {
-    func lineControllerStorage(_: LineControllerStorage, didCreate lineController: LineController) {
+    func lineControllerStorage(_ storage: LineControllerStorage, didCreate lineController: LineController) {
         lineController.delegate = self
         lineController.constrainingWidth = layoutManager.constrainingLineWidth
         lineController.estimatedLineFragmentHeight = theme.font.totalLineHeight
@@ -1686,66 +1621,60 @@ extension TextInputView: LineControllerStorageDelegate {
 }
 
 // MARK: - LineControllerDelegate
-
 extension TextInputView: LineControllerDelegate {
-    func lineSyntaxHighlighter(for _: LineController) -> LineSyntaxHighlighter? {
-        let syntaxHighlighter = languageMode.createLineSyntaxHighlighter()
-        syntaxHighlighter.kern = kern
-        return syntaxHighlighter
+    func lineSyntaxHighlighter(for lineController: LineController) -> LineSyntaxHighlighter? {
+        languageMode.createLineSyntaxHighlighter()
     }
 
-    func lineControllerDidInvalidateLineWidthDuringAsyncSyntaxHighlight(_: LineController) {
+    func lineControllerDidInvalidateLineWidthDuringAsyncSyntaxHighlight(_ lineController: LineController) {
         setNeedsLayout()
         layoutManager.setNeedsLayout()
     }
 }
 
 // MARK: - LayoutManagerDelegate
-
 extension TextInputView: LayoutManagerDelegate {
-    func layoutManager(_: LayoutManager, didProposeContentOffsetAdjustment contentOffsetAdjustment: CGPoint) {
+    func layoutManager(_ layoutManager: LayoutManager, didProposeContentOffsetAdjustment contentOffsetAdjustment: CGPoint) {
         delegate?.textInputView(self, didProposeContentOffsetAdjustment: contentOffsetAdjustment)
     }
 }
 
 // MARK: - IndentControllerDelegate
-
 extension TextInputView: IndentControllerDelegate {
-    func indentController(_: IndentController, shouldInsert text: String, in range: NSRange) {
+    func indentController(_ controller: IndentController, shouldInsert text: String, in range: NSRange) {
         replaceText(in: range, with: text)
     }
 
-    func indentController(_: IndentController, shouldSelect range: NSRange) {
+    func indentController(_ controller: IndentController, shouldSelect range: NSRange) {
         inputDelegate?.selectionWillChange(self)
         selectedRange = range
         inputDelegate?.selectionDidChange(self)
     }
 
-    func indentControllerDidUpdateTabWidth(_: IndentController) {
+    func indentControllerDidUpdateTabWidth(_ controller: IndentController) {
         invalidateLines()
     }
 }
 
 // MARK: - EditMenuControllerDelegate
-
 extension TextInputView: EditMenuControllerDelegate {
-    func editMenuController(_: EditMenuController, caretRectAt location: Int) -> CGRect {
+    func editMenuController(_ controller: EditMenuController, caretRectAt location: Int) -> CGRect {
         caretRectService.caretRect(at: location, allowMovingCaretToNextLineFragment: false)
     }
 
-    func editMenuControllerShouldReplaceText(_: EditMenuController) {
+    func editMenuControllerShouldReplaceText(_ controller: EditMenuController) {
         replaceTextInSelectedHighlightedRange()
     }
 
-    func editMenuController(_: EditMenuController, canReplaceTextIn highlightedRange: HighlightedRange) -> Bool {
+    func editMenuController(_ controller: EditMenuController, canReplaceTextIn highlightedRange: HighlightedRange) -> Bool {
         delegate?.textInputView(self, canReplaceTextIn: highlightedRange) ?? false
     }
 
-    func editMenuController(_: EditMenuController, highlightedRangeFor range: NSRange) -> HighlightedRange? {
+    func editMenuController(_ controller: EditMenuController, highlightedRangeFor range: NSRange) -> HighlightedRange? {
         highlightedRange(for: range)
     }
 
-    func selectedRange(for _: EditMenuController) -> NSRange? {
+    func selectedRange(for controller: EditMenuController) -> NSRange? {
         selectedRange
     }
 }

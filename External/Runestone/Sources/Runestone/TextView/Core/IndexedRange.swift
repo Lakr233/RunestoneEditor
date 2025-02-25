@@ -5,11 +5,9 @@ final class IndexedRange: UITextRange {
     override var start: UITextPosition {
         IndexedPosition(index: range.location)
     }
-
     override var end: UITextPosition {
         IndexedPosition(index: range.location + range.length)
     }
-
     override var isEmpty: Bool {
         range.length == 0
     }

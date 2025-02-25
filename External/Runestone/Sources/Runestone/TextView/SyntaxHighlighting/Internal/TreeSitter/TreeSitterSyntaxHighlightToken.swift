@@ -28,9 +28,9 @@ extension TreeSitterSyntaxHighlightToken: Equatable {
 extension TreeSitterSyntaxHighlightToken {
     static func locationSort(_ lhs: TreeSitterSyntaxHighlightToken, _ rhs: TreeSitterSyntaxHighlightToken) -> Bool {
         if lhs.range.location != rhs.range.location {
-            lhs.range.location < rhs.range.location
+            return lhs.range.location < rhs.range.location
         } else {
-            lhs.range.length < rhs.range.length
+            return lhs.range.length < rhs.range.length
         }
     }
 }

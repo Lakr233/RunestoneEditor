@@ -14,7 +14,6 @@ final class LineFragmentController {
             }
         }
     }
-
     weak var lineFragmentView: LineFragmentView? {
         didSet {
             if lineFragmentView !== oldValue || lineFragmentView?.renderer !== renderer {
@@ -22,7 +21,6 @@ final class LineFragmentController {
             }
         }
     }
-
     var markedRange: NSRange? {
         get {
             renderer.markedRange
@@ -34,7 +32,6 @@ final class LineFragmentController {
             }
         }
     }
-
     var markedTextBackgroundColor: UIColor {
         get {
             renderer.markedTextBackgroundColor
@@ -46,7 +43,6 @@ final class LineFragmentController {
             }
         }
     }
-
     var markedTextBackgroundCornerRadius: CGFloat {
         get {
             renderer.markedTextBackgroundCornerRadius
@@ -58,7 +54,6 @@ final class LineFragmentController {
             }
         }
     }
-
     var highlightedRangeFragments: [HighlightedRangeFragment] {
         get {
             renderer.highlightedRangeFragments
@@ -75,15 +70,14 @@ final class LineFragmentController {
 
     init(lineFragment: LineFragment, invisibleCharacterConfiguration: InvisibleCharacterConfiguration) {
         self.lineFragment = lineFragment
-        renderer = LineFragmentRenderer(lineFragment: lineFragment, invisibleCharacterConfiguration: invisibleCharacterConfiguration)
-        renderer.delegate = self
+        self.renderer = LineFragmentRenderer(lineFragment: lineFragment, invisibleCharacterConfiguration: invisibleCharacterConfiguration)
+        self.renderer.delegate = self
     }
 }
 
 // MARK: - LineFragmentRendererDelegate
-
 extension LineFragmentController: LineFragmentRendererDelegate {
-    func string(in _: LineFragmentRenderer) -> String? {
+    func string(in lineFragmentRenderer: LineFragmentRenderer) -> String? {
         delegate?.string(in: self)
     }
 }

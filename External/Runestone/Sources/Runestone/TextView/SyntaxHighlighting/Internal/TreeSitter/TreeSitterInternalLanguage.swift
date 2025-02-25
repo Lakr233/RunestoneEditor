@@ -9,8 +9,7 @@ final class TreeSitterInternalLanguage {
     init(languagePointer: UnsafePointer<TSLanguage>,
          highlightsQuery: TreeSitterQuery?,
          injectionsQuery: TreeSitterQuery?,
-         indentationScopes: TreeSitterIndentationScopes?)
-    {
+         indentationScopes: TreeSitterIndentationScopes?) {
         self.languagePointer = languagePointer
         self.highlightsQuery = highlightsQuery
         self.injectionsQuery = injectionsQuery

@@ -51,8 +51,7 @@ public final class TreeSitterIndentationScopes {
     public init(indent: [String] = [],
                 inheritIndent: [String] = [],
                 outdent: [String] = [],
-                whitespaceDenotesBlocks: Bool = false)
-    {
+                whitespaceDenotesBlocks: Bool = false) {
         self.indent = indent
         self.inheritIndent = inheritIndent
         self.outdent = outdent
@@ -63,8 +62,8 @@ public final class TreeSitterIndentationScopes {
 extension TreeSitterIndentationScopes: CustomDebugStringConvertible {
     public var debugDescription: String {
         "[TreeSitterIndentationScopes indent=\(indent)"
-            + " inheritIndent=\(inheritIndent)"
-            + " outdent=\(outdent)"
-            + " whitespaceDenotesBlocks=\(whitespaceDenotesBlocks)]"
+        + " inheritIndent=\(inheritIndent)"
+        + " outdent=\(outdent)"
+        + " whitespaceDenotesBlocks=\(whitespaceDenotesBlocks)]"
     }
 }

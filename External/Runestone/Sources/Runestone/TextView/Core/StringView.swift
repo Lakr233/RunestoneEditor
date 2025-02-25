@@ -20,7 +20,6 @@ final class StringView {
             internalString = NSMutableString(string: newValue)
         }
     }
-
     private var internalString: NSMutableString {
         didSet {
             if internalString != oldValue {
@@ -28,7 +27,6 @@ final class StringView {
             }
         }
     }
-
     private var swiftString: String {
         if let swiftString = _swiftString {
             return swiftString
@@ -42,7 +40,7 @@ final class StringView {
     private var _swiftString: String?
 
     init(string: NSMutableString = NSMutableString()) {
-        internalString = string
+        self.internalString = string
     }
 
     convenience init(string: String) {
@@ -50,18 +48,18 @@ final class StringView {
     }
 
     func substring(in range: NSRange) -> String? {
-        if range.location >= 0, range.upperBound <= internalString.length, range.length > 0 {
-            internalString.substring(with: range)
+        if range.location >= 0 && range.upperBound <= internalString.length && range.length > 0 {
+            return internalString.substring(with: range)
         } else {
-            nil
+            return nil
         }
     }
 
     func character(at location: Int) -> Character? {
-        if location >= 0, location < string.length, let scalar = Unicode.Scalar(internalString.character(at: location)) {
-            Character(scalar)
+        if location >= 0 && location < string.length, let scalar = Unicode.Scalar(internalString.character(at: location)) {
+            return Character(scalar)
         } else {
-            nil
+            return nil
         }
     }
 
@@ -71,7 +69,7 @@ final class StringView {
     }
 
     func bytes(in range: ByteRange) -> StringViewBytesResult? {
-        guard range.lowerBound.value >= 0, range.upperBound <= string.byteCount else {
+        guard range.lowerBound.value >= 0 && range.upperBound <= string.byteCount else {
             return nil
         }
         let stringRange = NSRange(range)

@@ -6,11 +6,9 @@ struct ByteRange: Hashable {
     var lowerBound: ByteCount {
         location
     }
-
     var upperBound: ByteCount {
         location + length
     }
-
     var isEmpty: Bool {
         length == 0
     }
@@ -21,13 +19,13 @@ struct ByteRange: Hashable {
     }
 
     init(from startByte: ByteCount, to endByte: ByteCount) {
-        location = startByte
-        length = endByte - startByte
+        self.location = startByte
+        self.length = endByte - startByte
     }
 
     init(utf16Range: NSRange) {
-        location = ByteCount(utf16Range.location * 2)
-        length = ByteCount(utf16Range.length * 2)
+        self.location = ByteCount(utf16Range.location * 2)
+        self.length = ByteCount(utf16Range.length * 2)
     }
 
     func overlaps(_ otherRange: Self) -> Bool {

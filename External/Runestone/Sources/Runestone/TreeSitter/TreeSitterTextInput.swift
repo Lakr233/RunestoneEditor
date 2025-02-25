@@ -10,7 +10,7 @@ typealias TreeSitterReadCallback = (_ byteIndex: ByteCount, _ position: TreeSitt
 /// The implementation is inspired by SwiftTreeSitter.
 /// https://github.com/ChimeHQ/SwiftTreeSitter/blob/main/Sources/SwiftTreeSitter/Input.swift
 final class TreeSitterTextInput {
-    private let encoding: TSInputEncoding
+    fileprivate let encoding: TSInputEncoding
     fileprivate let callback: TreeSitterReadCallback
     fileprivate var bytePointers: [UnsafePointer<Int8>] = []
 
@@ -35,8 +35,7 @@ final class TreeSitterTextInput {
 private func read(payload: UnsafeMutableRawPointer?,
                   byteIndex: UInt32,
                   position: TSPoint,
-                  bytesRead: UnsafeMutablePointer<UInt32>?) -> UnsafePointer<Int8>?
-{
+                  bytesRead: UnsafeMutablePointer<UInt32>?) -> UnsafePointer<Int8>? {
     let input: TreeSitterTextInput = Unmanaged.fromOpaque(payload!).takeUnretainedValue()
     if let result = input.callback(ByteCount(byteIndex), TreeSitterTextPoint(position)) {
         bytesRead?.pointee = result.length

@@ -9,7 +9,6 @@ final class PageGuideController {
             }
         }
     }
-
     var kern: CGFloat = 0 {
         didSet {
             if kern != oldValue {
@@ -17,7 +16,6 @@ final class PageGuideController {
             }
         }
     }
-
     var column = 120 {
         didSet {
             if column != oldValue {
@@ -25,7 +23,6 @@ final class PageGuideController {
             }
         }
     }
-
     var columnOffset: CGFloat {
         if let columnOffset = _columnOffset {
             return columnOffset

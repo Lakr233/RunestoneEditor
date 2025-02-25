@@ -5,7 +5,6 @@ import XCTest
 final class TextInputStringTokenizerTests: XCTestCase {}
 
 // MARK: - Movement in Lines
-
 extension TextInputStringTokenizerTests {
     // This is equivalent to doing Cmd+Right at the very beginning of the document.
     func testMovingToEndOfFirstLineFragmentFromBeginningOfDocument() {
@@ -149,7 +148,6 @@ extension TextInputStringTokenizerTests {
 }
 
 // MARK: - Movement in Paragraphs
-
 extension TextInputStringTokenizerTests {
     // This is equivalent to doing Ctrl+E at the very beginning of the document.
     func testMovingToEndOfParagraphFromBeginningOfDocument() {
@@ -256,11 +254,11 @@ private extension TextInputStringTokenizerTests {
     private var sampleText: String {
         // swiftlint:disable line_length
         """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras commodo pretium lorem et scelerisque. Sed urna massa, eleifend vel suscipit et, finibus ut nisi. Praesent ullamcorper justo ut lectus faucibus venenatis. Suspendisse lobortis libero sed odio iaculis, quis blandit ante accumsan.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras commodo pretium lorem et scelerisque. Sed urna massa, eleifend vel suscipit et, finibus ut nisi. Praesent ullamcorper justo ut lectus faucibus venenatis. Suspendisse lobortis libero sed odio iaculis, quis blandit ante accumsan.
 
-        Quisque sed hendrerit diam. Quisque ut enim ligula.
-        Donec laoreet, massa sed commodo tincidunt, dui neque ullamcorper sapien, laoreet efficitur nisi est semper velit.
-        """
+Quisque sed hendrerit diam. Quisque ut enim ligula.
+Donec laoreet, massa sed commodo tincidunt, dui neque ullamcorper sapien, laoreet efficitur nisi est semper velit.
+"""
         // swiftlint:enable line_length
     }
 
@@ -291,7 +289,7 @@ private extension TextInputStringTokenizerTests {
 }
 
 extension TextInputStringTokenizerTests: LineControllerStorageDelegate {
-    func lineControllerStorage(_: LineControllerStorage, didCreate lineController: LineController) {
+    func lineControllerStorage(_ storage: LineControllerStorage, didCreate lineController: LineController) {
         // Configured with the same values as running the example project in the iPhone 8 simulator.
         lineController.delegate = self
         lineController.constrainingWidth = 365
@@ -300,11 +298,10 @@ extension TextInputStringTokenizerTests: LineControllerStorageDelegate {
 }
 
 extension TextInputStringTokenizerTests: LineControllerDelegate {
-    func lineSyntaxHighlighter(for _: LineController) -> LineSyntaxHighlighter? {
+    func lineSyntaxHighlighter(for lineController: LineController) -> LineSyntaxHighlighter? {
         PlainTextSyntaxHighlighter()
     }
 
-    func lineControllerDidInvalidateLineWidthDuringAsyncSyntaxHighlight(_: LineController) {}
+    func lineControllerDidInvalidateLineWidthDuringAsyncSyntaxHighlight(_ lineController: LineController) {}
 }
-
 // swiftlint:enable force_cast

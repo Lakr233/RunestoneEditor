@@ -1,17 +1,17 @@
 import Foundation
 
 final class PlainTextInternalLanguageMode: InternalLanguageMode {
-    func parse(_: NSString) {}
+    func parse(_ text: NSString) {}
 
-    func parse(_: NSString, completion: @escaping ((Bool) -> Void)) {
+    func parse(_ text: NSString, completion: @escaping ((Bool) -> Void)) {
         completion(true)
     }
 
-    func textDidChange(_: TextChange) -> LineChangeSet {
+    func textDidChange(_ change: TextChange) -> LineChangeSet {
         LineChangeSet()
     }
 
-    func tokenType(at _: Int) -> String? {
+    func tokenType(at location: Int) -> String? {
         nil
     }
 
@@ -19,23 +19,22 @@ final class PlainTextInternalLanguageMode: InternalLanguageMode {
         PlainTextSyntaxHighlighter()
     }
 
-    func highestSyntaxNode(at _: LinePosition) -> SyntaxNode? {
+    func highestSyntaxNode(at linePosition: LinePosition) -> SyntaxNode? {
         nil
     }
 
-    func syntaxNode(at _: LinePosition) -> SyntaxNode? {
+    func syntaxNode(at linePosition: LinePosition) -> SyntaxNode? {
         nil
     }
 
-    func currentIndentLevel(of _: DocumentLineNode, using _: IndentStrategy) -> Int {
+    func currentIndentLevel(of line: DocumentLineNode, using indentStrategy: IndentStrategy) -> Int {
         0
     }
 
     func strategyForInsertingLineBreak(
-        from _: LinePosition,
-        to _: LinePosition,
-        using _: IndentStrategy
-    ) -> InsertLineBreakIndentStrategy {
+        from startLinePosition: LinePosition,
+        to endLinePosition: LinePosition,
+        using indentStrategy: IndentStrategy) -> InsertLineBreakIndentStrategy {
         InsertLineBreakIndentStrategy(indentLevel: 0, insertExtraLineBreak: false)
     }
 

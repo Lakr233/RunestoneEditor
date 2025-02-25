@@ -104,47 +104,47 @@ public protocol TextViewDelegate: AnyObject {
 }
 
 public extension TextViewDelegate {
-    func textViewShouldBeginEditing(_: TextView) -> Bool {
+    func textViewShouldBeginEditing(_ textView: TextView) -> Bool {
         true
     }
 
-    func textViewShouldEndEditing(_: TextView) -> Bool {
+    func textViewShouldEndEditing(_ textView: TextView) -> Bool {
         true
     }
 
-    func textViewDidBeginEditing(_: TextView) {}
+    func textViewDidBeginEditing(_ textView: TextView) {}
 
-    func textViewDidEndEditing(_: TextView) {}
+    func textViewDidEndEditing(_ textView: TextView) {}
 
-    func textViewDidChange(_: TextView) {}
+    func textViewDidChange(_ textView: TextView) {}
 
-    func textViewDidChangeSelection(_: TextView) {}
+    func textViewDidChangeSelection(_ textView: TextView) {}
 
-    func textView(_: TextView, shouldChangeTextIn _: NSRange, replacementText _: String) -> Bool {
+    func textView(_ textView: TextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         true
     }
 
-    func textView(_: TextView, shouldInsert _: CharacterPair, in _: NSRange) -> Bool {
+    func textView(_ textView: TextView, shouldInsert characterPair: CharacterPair, in range: NSRange) -> Bool {
         true
     }
 
-    func textView(_: TextView, shouldSkipTrailingComponentOf _: CharacterPair, in _: NSRange) -> Bool {
+    func textView(_ textView: TextView, shouldSkipTrailingComponentOf characterPair: CharacterPair, in range: NSRange) -> Bool {
         true
     }
 
-    func textViewDidChangeGutterWidth(_: TextView) {}
+    func textViewDidChangeGutterWidth(_ textView: TextView) {}
 
-    func textViewDidBeginFloatingCursor(_: TextView) {}
+    func textViewDidBeginFloatingCursor(_ textView: TextView) {}
 
-    func textViewDidEndFloatingCursor(_: TextView) {}
+    func textViewDidEndFloatingCursor(_ textView: TextView) {}
 
-    func textViewDidLoopToLastHighlightedRange(_: TextView) {}
+    func textViewDidLoopToLastHighlightedRange(_ textView: TextView) {}
 
-    func textViewDidLoopToFirstHighlightedRange(_: TextView) {}
+    func textViewDidLoopToFirstHighlightedRange(_ textView: TextView) {}
 
-    func textView(_: TextView, canReplaceTextIn _: HighlightedRange) -> Bool {
+    func textView(_ textView: TextView, canReplaceTextIn highlightedRange: HighlightedRange) -> Bool {
         false
     }
 
-    func textView(_: TextView, replaceTextIn _: HighlightedRange) {}
+    func textView(_ textView: TextView, replaceTextIn highlightedRange: HighlightedRange) {}
 }

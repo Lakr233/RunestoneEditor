@@ -8,7 +8,6 @@ final class LineFragmentView: UIView, ReusableView {
             }
         }
     }
-
     override var frame: CGRect {
         didSet {
             if frame.size != oldValue.size {
@@ -25,8 +24,7 @@ final class LineFragmentView: UIView, ReusableView {
         isUserInteractionEnabled = false
     }
 
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

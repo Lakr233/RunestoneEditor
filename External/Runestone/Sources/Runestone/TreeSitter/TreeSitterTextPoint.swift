@@ -4,7 +4,6 @@ final class TreeSitterTextPoint {
     var row: UInt32 {
         rawValue.row
     }
-
     var column: UInt32 {
         rawValue.column
     }
@@ -12,11 +11,11 @@ final class TreeSitterTextPoint {
     let rawValue: TSPoint
 
     init(_ point: TSPoint) {
-        rawValue = point
+        self.rawValue = point
     }
 
     init(row: UInt32, column: UInt32) {
-        rawValue = TSPoint(row: row, column: column)
+        self.rawValue = TSPoint(row: row, column: column)
     }
 }
 

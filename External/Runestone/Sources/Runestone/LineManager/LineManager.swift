@@ -22,21 +22,17 @@ final class LineManager {
     var lineCount: Int {
         documentLineTree.nodeTotalCount
     }
-
     var contentHeight: CGFloat {
         let rightMost = documentLineTree.root.rightMost
         return rightMost.yPosition + rightMost.data.lineHeight
     }
-
     var estimatedLineHeight: CGFloat = 12
     var firstLine: DocumentLineNode {
         documentLineTree.root.leftMost
     }
-
     var lastLine: DocumentLineNode {
         documentLineTree.root.rightMost
     }
-
     // When rebuilding, and only when rebuilding, the tree we keep track of the longest line.
     // This helps the text editor to determine the width of the content. The "initial" in the name implies
     // that the reference does not necessarily point to the longest line as the document is edited.
@@ -64,7 +60,7 @@ final class LineManager {
         var lines: [DocumentLineNode] = []
         var lastDelimiterEnd = 0
         var totalLineHeight: CGFloat = 0
-        var longestLineLength = 0
+        var longestLineLength: Int = 0
         while let newLineRange = workingNewLineRange {
             let totalLength = newLineRange.location + newLineRange.length - lastDelimiterEnd
             let substringRange = NSRange(location: lastDelimiterEnd, length: totalLength)
@@ -214,10 +210,10 @@ final class LineManager {
     }
 
     func line(containingCharacterAt location: Int) -> DocumentLineNode? {
-        if location >= 0, location <= Int(documentLineTree.nodeTotalValue) {
-            documentLineTree.node(containingLocation: location)
+        if location >= 0 && location <= Int(documentLineTree.nodeTotalValue) {
+            return documentLineTree.node(containingLocation: location)
         } else {
-            nil
+            return nil
         }
     }
 
@@ -269,14 +265,14 @@ final class LineManager {
     func startAndEndLine(in range: NSRange) -> (startLine: DocumentLineNode, endLine: DocumentLineNode)? {
         if range.length == 0 {
             if let line = line(containingCharacterAt: range.lowerBound) {
-                (line, line)
+                return (line, line)
             } else {
-                nil
+                return nil
             }
         } else if let startLine = line(containingCharacterAt: range.lowerBound), let endLine = line(containingCharacterAt: range.upperBound) {
-            (startLine, endLine)
+            return (startLine, endLine)
         } else {
-            nil
+            return nil
         }
     }
 
@@ -311,9 +307,9 @@ private extension LineManager {
             if lastChar == Symbol.carriageReturn {
                 line.data.delimiterLength = 1
             } else if lastChar == Symbol.lineFeed {
-                if newTotalLength >= 2, getCharacter(at: Int(line.location) + newTotalLength - 2) == Symbol.carriageReturn {
+                if newTotalLength >= 2 && getCharacter(at: Int(line.location) + newTotalLength - 2) == Symbol.carriageReturn {
                     line.data.delimiterLength = 2
-                } else if newTotalLength == 1, line.location > 0, getCharacter(at: Int(line.location) - 1) == Symbol.carriageReturn {
+                } else if newTotalLength == 1 && line.location > 0 && getCharacter(at: Int(line.location) - 1) == Symbol.carriageReturn {
                     // We need to join this line with the previous line.
                     let previousLine = line.previous
                     changeSet.markLineRemoved(line)

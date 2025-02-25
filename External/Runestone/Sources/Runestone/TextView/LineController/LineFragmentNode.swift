@@ -10,7 +10,6 @@ final class LineFragmentNodeData {
     var lineFragmentHeight: CGFloat {
         lineFragment?.scaledSize.height ?? 0
     }
-
     var totalLineFragmentHeight: CGFloat = 0
 
     init(lineFragment: LineFragment?) {

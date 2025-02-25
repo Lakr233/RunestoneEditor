@@ -4,7 +4,7 @@ protocol RedBlackTreeNodeID: Identifiable, Hashable {
     init()
 }
 
-typealias RedBlackTreeNodeValue = AdditiveArithmetic & Comparable
+typealias RedBlackTreeNodeValue = Comparable & AdditiveArithmetic
 
 final class RedBlackTreeNode<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTreeNodeValue, NodeData> {
     typealias Tree = RedBlackTree<NodeID, NodeValue, NodeData>
@@ -15,12 +15,10 @@ final class RedBlackTreeNode<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTree
     var location: NodeValue {
         tree.location(of: self)
     }
-
     var value: NodeValue
     var index: Int {
         tree.index(of: self)
     }
-
     var left: RedBlackTreeNode?
     var right: RedBlackTreeNode?
     weak var parent: RedBlackTreeNode?
@@ -28,7 +26,7 @@ final class RedBlackTreeNode<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTree
     let data: NodeData
     var tree: Tree {
         if let tree = _tree {
-            tree
+            return tree
         } else {
             fatalError("Accessing tree after it has been deallocated.")
         }
@@ -37,9 +35,9 @@ final class RedBlackTreeNode<NodeID: RedBlackTreeNodeID, NodeValue: RedBlackTree
     private weak var _tree: Tree?
 
     init(tree: Tree, value: NodeValue, data: NodeData) {
-        _tree = tree
-        nodeTotalCount = 1
-        nodeTotalValue = value
+        self._tree = tree
+        self.nodeTotalCount = 1
+        self.nodeTotalValue = value
         self.value = value
         self.data = data
     }
@@ -53,7 +51,6 @@ extension RedBlackTreeNode {
         }
         return node
     }
-
     var rightMost: RedBlackTreeNode {
         var node = self
         while let newNode = node.right {
@@ -61,9 +58,8 @@ extension RedBlackTreeNode {
         }
         return node
     }
-
     var previous: RedBlackTreeNode {
-        if let left {
+        if let left = left {
             return left.rightMost
         } else {
             var oldNode = self
@@ -75,9 +71,8 @@ extension RedBlackTreeNode {
             return node
         }
     }
-
     var next: RedBlackTreeNode {
-        if let right {
+        if let right = right {
             return right.leftMost
         } else {
             var oldNode = self

@@ -8,7 +8,6 @@ final class GutterBackgroundView: UIView {
             }
         }
     }
-
     var hairlineColor: UIColor? {
         get {
             hairlineView.backgroundColor
@@ -20,13 +19,12 @@ final class GutterBackgroundView: UIView {
 
     private let hairlineView = UIView()
 
-    override init(frame _: CGRect = .zero) {
+    override init(frame: CGRect = .zero) {
         super.init(frame: .zero)
         addSubview(hairlineView)
     }
 
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

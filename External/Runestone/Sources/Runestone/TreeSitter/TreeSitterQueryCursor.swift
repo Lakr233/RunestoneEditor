@@ -7,7 +7,7 @@ final class TreeSitterQueryCursor {
     private var haveExecuted = false
 
     init(query: TreeSitterQuery, node: TreeSitterNode) {
-        pointer = ts_query_cursor_new()
+        self.pointer = ts_query_cursor_new()
         self.query = query
         self.node = node
     }

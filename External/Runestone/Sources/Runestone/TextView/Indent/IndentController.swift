@@ -19,7 +19,6 @@ final class IndentController {
             }
         }
     }
-
     var indentStrategy: IndentStrategy {
         didSet {
             if indentStrategy != oldValue {
@@ -27,17 +26,11 @@ final class IndentController {
             }
         }
     }
-
     var tabWidth: CGFloat {
         if let tabWidth = _tabWidth {
             return tabWidth
         } else {
-            let str = String(repeating: " ", count: indentStrategy.tabLength)
-            let maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: .greatestFiniteMagnitude)
-            let options: NSStringDrawingOptions = [.usesFontLeading, .usesLineFragmentOrigin]
-            let attributes: [NSAttributedString.Key: Any] = [.font: indentFont]
-            let bounds = str.boundingRect(with: maxSize, options: options, attributes: attributes, context: nil)
-            let tabWidth = round(bounds.size.width)
+            let tabWidth = TabWidthMeasurer.tabWidth(tabLength: indentStrategy.tabLength, font: indentFont)
             if tabWidth != _tabWidth {
                 _tabWidth = tabWidth
                 delegate?.indentControllerDidUpdateTabWidth(self)
@@ -89,7 +82,7 @@ final class IndentController {
                 newSelectedRange.length -= utf16IndentLength
             }
         }
-        if let replacementString {
+        if let replacementString = replacementString {
             delegate?.indentController(self, shouldInsert: replacementString, in: originalRange)
             delegate?.indentController(self, shouldSelect: newSelectedRange)
         }
@@ -112,7 +105,7 @@ final class IndentController {
                 newSelectedRange.length += indentLength
             }
         }
-        if let replacementString {
+        if let replacementString = replacementString {
             delegate?.indentController(self, shouldInsert: replacementString, in: originalRange)
             delegate?.indentController(self, shouldSelect: newSelectedRange)
         }
@@ -121,8 +114,7 @@ final class IndentController {
     func insertLineBreak(in range: NSRange, using lineEnding: LineEnding) {
         let symbol = lineEnding.symbol
         if let startLinePosition = lineManager.linePosition(at: range.lowerBound),
-           let endLinePosition = lineManager.linePosition(at: range.upperBound)
-        {
+            let endLinePosition = lineManager.linePosition(at: range.upperBound) {
             let strategy = languageMode.strategyForInsertingLineBreak(from: startLinePosition, to: endLinePosition, using: indentStrategy)
             if strategy.insertExtraLineBreak {
                 // Inserting a line break enters a new indentation level.
@@ -148,11 +140,12 @@ final class IndentController {
         guard let line = lineManager.line(containingCharacterAt: location) else {
             return nil
         }
-        let tabLength: Int = switch indentStrategy {
+        let tabLength: Int
+        switch indentStrategy {
         case .tab:
-            1
-        case let .space(length):
-            length
+            tabLength = 1
+        case .space(let length):
+            tabLength = length
         }
         let localLocation = location - line.location
         guard localLocation >= tabLength else {
